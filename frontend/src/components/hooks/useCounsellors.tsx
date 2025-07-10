@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 import AuthService from '@/services/AuthService'; // Adjust path to your AuthService
 import { Consultant } from '../../types/types'; // Import the unified Consultant interface

@@ -70,7 +70,7 @@ export interface FormErrors {
 
 
 
-// types/index.ts
+// types/main-service.ts
 export interface Service {
   icon: React.ReactNode;
   title: string;
@@ -89,4 +89,44 @@ export interface CategoryImage {
   students: string;
   professionals: string;
   institutions: string;
+}
+
+
+
+
+
+//types/about.ts
+import { LucideIcon } from 'lucide-react';
+
+export interface ReasonItem {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+}
+
+export interface SpecialtyItem {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+}
+
+export interface FeatureItem {
+  text: string;
+}
+
+
+
+
+
+
+//improve
+
+
+export interface TherapyImprovement {
+  title: string;
+  desc: string;
+  icon: string;
+  bgImage: string;
 }

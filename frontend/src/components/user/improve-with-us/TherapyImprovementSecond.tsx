@@ -5,7 +5,7 @@ import { motion, Variants } from 'framer-motion';
 import { therapyImprovements } from './therapyData';
 import TherapyCard from './TherapyCard';
 import ScrollIndicators from './ScrollIndicators';
-import ShowMoreButton from './ShowMoreButton';
+// import ShowMoreButton from './ShowMoreButton';
 import type { TherapyImprovement } from '../../../types/types';
 
 // Define animation variants properly with correct typing
@@ -73,7 +73,8 @@ const TherapyImprovementsSection: React.FC = () => {
             initial="hidden"
             animate="visible"
           >
-            {therapyImprovements.slice(0, 4).map((item: TherapyImprovement, index: number) => (
+           {therapyImprovements.map((item: TherapyImprovement, index: number) => (
+
               <TherapyCard
                 key={item.title}
                 item={item}
@@ -85,7 +86,7 @@ const TherapyImprovementsSection: React.FC = () => {
           </motion.div>
           <ScrollIndicators />
         </div>
-        <ShowMoreButton />
+        {/* <ShowMoreButton /> */}
       </div>
     </motion.section>
   );

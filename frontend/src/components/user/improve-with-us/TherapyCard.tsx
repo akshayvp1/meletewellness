@@ -1,73 +1,122 @@
-'use client';
-
 import React from 'react';
-import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import Image from 'next/image';
-import { TherapyImprovement } from '../../../types/types';
-import { iconMap, cardVariants } from './therapyData';
-import CardSkeleton from './CardSkeleton';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { TherapyImprovement } from '@/types/types';
+import { iconMap } from '@/utils/iconMap';
 
-interface TherapyCardProps {
+export interface TherapyCardProps {
   item: TherapyImprovement;
   index: number;
-  isImageLoaded: boolean;
-  onImageLoad: (imageSrc: string) => void;
+  isActive?: boolean;
+  onClick?: () => void;
+  isImageLoaded?: boolean;
+  onImageLoad?: (imageSrc: string) => void;
 }
 
-const TherapyCard: React.FC<TherapyCardProps> = ({ item, index, isImageLoaded, onImageLoad }) => {
-  const router = useRouter();
+const sectionVariants: Variants = {
+  hidden: { 
+    opacity: 0, 
+    y: 50, 
+    rotate: -5 
+  },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    rotate: 0,
+    transition: { 
+      delay: i * 0.1, 
+      duration: 0.7 
+    },
+  }),
+  hover: {
+    scale: 1.05,
+    boxShadow: '0 10px 20px rgba(0,0,0,0.2)',
+    transition: { 
+      duration: 0.3 
+    },
+  },
+};
+
+const TherapyCard: React.FC<TherapyCardProps> = ({ 
+  item, 
+  index, 
+  isActive = false, 
+  onClick,
+  isImageLoaded,
+  onImageLoad 
+}) => {
   const IconComponent = iconMap[item.icon];
+
+  const handleImageLoad = () => {
+    if (onImageLoad) {
+      onImageLoad(item.bgImage);
+    }
+  };
 
   return (
     <motion.div
-      className="flex-shrink-0 w-80 md:w-full snap-center"
-      variants={cardVariants}
+      className="relative p-6 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 group overflow-hidden cursor-pointer"
+      style={{
+        minHeight: '300px',
+        backgroundImage: `url(${item.bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
+      variants={sectionVariants}
+      initial="hidden"
+      animate="visible"
       custom={index}
       whileHover="hover"
-      role="button"
-      tabIndex={0}
-      onClick={() => router.push('/improve')}
-      onKeyDown={(e) => e.key === 'Enter' && router.push('/improve')}
-      aria-label={`Learn more about improving ${item.title}`}
+      onClick={onClick}
     >
-      {isImageLoaded ? (
-        <div className="bg-white rounded-2xl shadow-md overflow-hidden h-96 group relative">
-          <div className="relative h-48 w-full">
-            <Image
-              src={item.bgImage}
-              alt={`${item.title} illustration`}
-              fill
-              className="object-cover group-hover:scale-110 transition-transform duration-500"
-              sizes="(max-width: 768px) 320px, 25vw"
-              priority={index < 2}
-              quality={75}
-            />
-          </div>
-          <div className="p-6 text-center">
-            {IconComponent && (
-              <IconComponent className="w-8 h-8 text-[#31A382] mx-auto mb-4" aria-hidden="true" />
-            )}
-            <h3 className="text-lg font-semibold text-[#015F4A] mb-3">{item.title}</h3>
-            <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">{item.desc}</p>
-          </div>
-          <div className="absolute inset-0 bg-[#015F4A] bg-opacity-0 group-hover:bg-opacity-70 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <span className="text-white font-medium">Learn More</span>
-          </div>
-        </div>
-      ) : (
-        <CardSkeleton />
+      {/* Hidden image for preloading */}
+      {onImageLoad && (
+        <img
+          src={item.bgImage}
+          alt=""
+          className="hidden"
+          onLoad={handleImageLoad}
+        />
       )}
-      <Image
-        src={item.bgImage}
-        alt=""
-        width={0}
-        height={0}
-        sizes="100vw"
-        className="hidden"
-        onLoad={() => onImageLoad(item.bgImage)}
-        onError={() => onImageLoad(item.bgImage)}
-      />
+      
+      <div
+        className={`absolute inset-0 transition-all duration-300 ${
+          isActive 
+            ? 'bg-[#015F4A] opacity-80' 
+            : 'bg-black opacity-40 group-hover:bg-[#015F4A] group-hover:opacity-80'
+        }`}
+      ></div>
+      
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+        <div className="mb-5">
+          {IconComponent ? <IconComponent style={{ color: '#31A382' }} /> : null}
+        </div>
+        <h3 className="text-lg font-semibold mb-3 text-center">{item.title}</h3>
+        
+        <AnimatePresence>
+          {isActive ? (
+            <motion.div
+              className="absolute inset-0 flex items-center justify-center p-4 text-sm leading-relaxed text-center bg-[#015F4A] bg-opacity-90"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div className="max-h-full overflow-y-auto scrollbar-thin scrollbar-thumb-[#31A382] scrollbar-track-transparent px-2">
+                {item.desc}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.p
+              className="text-sm leading-relaxed text-center max-w-xs transition-opacity duration-300"
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              {item.desc.substring(0, 50) + '...'}
+            </motion.p>
+          )}
+        </AnimatePresence>
+      </div>
     </motion.div>
   );
 };
