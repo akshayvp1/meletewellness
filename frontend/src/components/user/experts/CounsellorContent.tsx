@@ -1,6 +1,6 @@
 
 import React from 'react';
-import LoadingState from '@/components/user/child-support/LoadingSpinner';
+import LoadingState from '@/components/loading/LoadingSpinner';
 import ErrorState from '@/components/user/experts/ErrorState';
 import EmptyState from '@/components/user/experts/EmptyState';
 import CounsellorGrid from '@/components/user/experts/CounsellorGrid';
@@ -35,11 +35,11 @@ const CounsellorContent: React.FC<CounsellorContentProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
-      <ResultsInfo 
+      {/* <ResultsInfo 
         startIndex={startIndex} 
         endIndex={endIndex} 
         totalCount={consultants.length} 
-      />
+      /> */}
       
       <div className="mb-8">
         <CounsellorGrid consultants={currentConsultants} />

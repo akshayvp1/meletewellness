@@ -8,6 +8,7 @@ import { inject, injectable } from "tsyringe";
 import { IAdminAuthController } from "./interface/IAdminAuthController";
 import AdminAuthService from "../services/AdminAuthService";
 import { ITokenPayload } from "../utils/jwt";
+// import { ICollege } from "../interfaces/ICollege";
 interface ICounsellorData {
   name: string;
   qualification: string;
@@ -266,6 +267,294 @@ class AdminAuthController implements IAdminAuthController {
       next(error);
     }
   };
+
+  // GoogleLogin = async(req:Request,res:Response):Promise<void>=>{
+  //   try{
+  //     console.log("🥰🥰🥰");
+      
+  //      const {credential} = req.body;
+
+  //        if (!credential) {
+  //       res.status(400).json({ message: "Google credential is required." });
+  //       return;
+  //     }
+
+  //      const result = await this.adminAuthService.GoogleLogin(credential);
+  //      const { user,accessToken,refreshToken} = result;
+  //      res.cookie("refreshToken", refreshToken, {
+  //       httpOnly: true,
+  //       secure: process.env.NODE_ENV === "production",
+  //       sameSite: "lax",
+  //       maxAge: 7 * 24 * 60 * 60 * 1000,
+  //     });
+
+  //     res.status(200).json({ user, accessToken});
+  //       return;
+  //   }catch(error){
+  //    console.log(error);
+     
+  //   }
+  // }
+
+GoogleLogin = async (req: Request, res: Response): Promise<void> => {
+  try {
+    console.log("🥰🥰🥰 Google Login Request");
+    
+    const { credential } = req.body;
+
+    if (!credential) {
+      res.status(400).json({ message: "Google credential is required." });
+      return;
+    }
+
+    const result = await this.adminAuthService.GoogleLogin(credential);
+    const { user, accessToken, refreshToken } = result;
+    
+    // Set refresh token as HTTP-only cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.status(200).json({ 
+      user, 
+      accessToken,
+      message: "Google login successful" 
+    });
+    
+  } catch (error) {
+    console.error("Google Login Controller Error:", error);
+    res.status(500).json({ 
+      message: "Internal server error during Google authentication",
+      error: error instanceof Error ? error.message : "Unknown error"
+    });
+  }
+}
+
+//  addCollegeData = async (req: Request, res: Response): Promise<void> => {
+//     try {
+//       const collegeData: ICollege = req.body;
+
+//       if (collegeData) {
+//         const college = await this.adminAuthService.addCollegeData(collegeData);
+//         res.status(200).json({
+//           success: true,
+//           data: college,
+//           message: "College added successfully",
+//         });
+//       } else {
+//         res.status(400).json({
+//           success: false,
+//           message: "Invalid request data",
+//         });
+//       }
+//     } catch (error) {
+//       console.error("Controller Error (addCollegeData):", error);
+//       res.status(500).json({
+//         success: false,
+//         message: "Internal server error",
+//       });
+//     }
+//   };
+
+addCollegeData = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const collegeData = req.body;
+
+      // Validate required fields
+      if (!collegeData.collegeName || !collegeData.mobile || !collegeData.email) {
+        res.status(400).json({
+          success: false,
+          message: "Missing required fields: collegeName, mobile, email",
+        });
+        return;
+      }
+
+      const addedCollege = await this.adminAuthService.addCollegeData(collegeData);
+
+      res.status(201).json({
+        success: true,
+        data: addedCollege,
+        message: "College added successfully",
+      });
+    } catch (error: any) {
+      console.error("Error in addCollegeData:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Failed to add college",
+      });
+    }
+  };
+
+  UpdateCollegeData = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { editingId } = req.params;
+      
+      if (!editingId) {
+        res.status(400).json({ 
+          success: false, 
+          message: "College ID is required" 
+        });
+        return;
+      }
+
+      const updateData = req.body; // Direct access to body, not nested
+      
+      const updatedCollege = await this.adminAuthService.UpdateCollegeData(editingId, updateData);
+      
+      res.status(200).json({
+        success: true,
+        data: updatedCollege,
+        message: "College updated successfully",
+      });
+    } catch (error: any) {
+      console.error("Error in UpdateCollegeData controller:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Failed to update college",
+      });
+    }
+  };
+
+  getAllColleges = async (_req: Request, res: Response): Promise<void> => {
+    try {
+      const colleges = await this.adminAuthService.getAllColleges();
+      
+      res.status(200).json({
+        success: true,
+        data: colleges,
+        message: "Colleges retrieved successfully"
+      });
+    } catch (error: any) {
+      console.error("Error in getAllColleges:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Internal server error" 
+      });
+    }
+  };
+
+
+
+
+
+  getCollegesList = async (_req: Request, res: Response): Promise<void> => {
+    try {
+      
+      const colleges = await this.adminAuthService.getCollegesList();
+      
+      res.status(200).json({
+        success: true,
+        data: colleges,
+        message: "Colleges retrieved successfully"
+      });
+    } catch (error: any) {
+      console.error("Error in getAllColleges:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Internal server error" 
+      });
+    }
+  };
+  createUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const userData = req.body
+
+      const user = await this.adminAuthService.createUser(userData);
+      
+      res.status(200).json({
+        success: true,
+        data: user,
+        message: "user created successfully"
+      });
+    } catch (error: any) {
+      console.error("Error in getAllColleges:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Internal server error" 
+      });
+    }
+  };
+
+  updateAdminUser = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { userId } = req.params;
+      
+      if (!userId) {
+        res.status(400).json({ 
+          success: false, 
+          message: "user ID is required" 
+        });
+        return;
+      }
+
+      const updateData = req.body; // Direct access to body, not nested
+      
+      const updatedUser = await this.adminAuthService.updateAdminUser(userId, updateData);
+      
+      res.status(200).json({
+        success: true,
+        data: updatedUser,
+        message: "user updated successfully",
+      });
+    } catch (error: any) {
+      console.error("Error in UpdateCollegeData controller:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Failed to update college",
+      });
+    }
+  };
+
+
+  getUsersList = async (_req: Request, res: Response): Promise<void> => {
+    try {
+      const users = await this.adminAuthService.getUsersList();
+      
+      res.status(200).json({
+        success: true,
+        data: users,
+        message: "user list retrieved successfully"
+      });
+    } catch (error: any) {
+      console.error("Error in getAllColleges:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Internal server error" 
+      });
+    }
+  };
+
+
+  Check = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const email = req.user?.email; // or from req.body.email if passed that way
+    console.log(email,"ndhaaa");
+    
+    if (!email) {
+      res.status(400).json({ success: false, message: "Email is required" });
+      return;
+    }
+
+    const exists = await this.adminAuthService.Check(email);
+
+    res.status(200).json({
+      success: true,
+      exists,
+      message: exists ? "Email exists in system" : "Email not found"
+    });
+  } catch (error: any) {
+    console.error("Error in Check controller:", error);
+    res.status(500).json({ 
+      success: false,
+      message: error.message || "Internal server error" 
+    });
+  }
+};
+
+  
 }
 
 export default AdminAuthController;

@@ -1,9 +1,11 @@
+"use client"
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { AuthState, UserRole } from '../../types/auth/auth.types';
-
+import store from '../app/store';
 const initialAuthState: AuthState = {
+    name:"",
     email: "",
     role: null,
     token: null,
@@ -17,14 +19,16 @@ const authSlice = createSlice({
         signIn: (
             state,
             action: PayloadAction<{
+                name:string
                 email: string;
                 role: UserRole; 
                 token: string;
                 isAuthenticated?: boolean;
             }>
         ) => {
-            const { email, role, token, isAuthenticated } = action.payload;
+            const { email,name, role, token, isAuthenticated } = action.payload;
             state.isAuthenticated = isAuthenticated ?? true;
+            state.name=name;
             state.email = email;
             state.role = role;
             state.token = token;

@@ -3,6 +3,12 @@ import { IAdminAuthRepository } from "./interface/IAdminAuthRepository";
 import { IAdmin } from "../interfaces/IAdmin";
 import { ICounsellor } from "../interfaces/ICounsellor";
 import { Model } from "mongoose";
+// import { User } from "../models/userModel";
+import { IUser } from "../interfaces/IUser";
+// import { ITokenPayload } from "../utils/jwt";
+import { OAuth2Client } from "google-auth-library";
+import { ICollege } from "../interfaces/ICollege";
+import { IAdminUser } from "../interfaces/IAdminUser";
 
 interface ICounsellorData {
   name: string;
@@ -18,18 +24,41 @@ interface ICounsellorData {
   phone: string;
   specialization: string;
 }
+export interface AddCollegeData {
+  collegeName: string;
+  mobile: string;
+  email: string;
+  isActive: boolean;
+  expiresAt?: Date;
+}
+
+export interface UpdateCollegeData {
+  collegeName?: string;
+  mobile?: string;
+  email?: string;
+  isActive?: boolean;
+  expiresAt?: Date;
+}
 
 @injectable()
 class AdminAuthRepository implements IAdminAuthRepository {
     private readonly adminModel: Model<IAdmin>;
     private readonly counsellorModel: Model<ICounsellor>;
-
+    private readonly userModel:Model<IUser>;
+    private readonly collegeModel:Model<ICollege>
+    private readonly adminUserModel:Model<IAdminUser>
     constructor(
         @inject("AdminModel") adminModel: Model<IAdmin>,
-        @inject("CounsellorModel") counsellorModel: Model<ICounsellor>
+        @inject("CounsellorModel") counsellorModel: Model<ICounsellor>,
+        @inject("UserModel")userModel:Model<IUser>,
+        @inject("CollegeModel")collegeModel:Model<ICollege>,
+        @inject("AdminUserModel")adminUserModel:Model<IAdminUser>
     ) {
         this.adminModel = adminModel;
         this.counsellorModel = counsellorModel;
+        this.userModel = userModel
+        this.collegeModel = collegeModel
+        this.adminUserModel=adminUserModel
     }
 
     async findByEmail(email: string): Promise<IAdmin | null> {
@@ -155,6 +184,219 @@ async updateCounsellor(id: string, counsellorData: ICounsellorData & { rating?: 
     throw new Error(error instanceof Error ? error.message : "Failed to update counsellor");
   }
 }
+
+// Repository Layer
+async GoogleLogin(credential: string): Promise<any> {
+  try {
+    const client = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
+    
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    
+    if (!payload || !payload.email || !payload.name) {
+      throw new Error("Invalid Google credentials.");
+    }
+
+    // Check if user already exists
+    const existingUser = await this.userModel.findOne({ email: payload.email });
+    
+    if (existingUser) {
+      // User exists, return existing user
+      return { user: existingUser };
+    }
+
+    // If user doesn't exist, create one
+    const newUser = new this.userModel({
+      name: payload.name,
+      email: payload.email,
+      profile: payload.picture,
+      isActive: true, // Assuming Google login means user is verified
+    });
+
+    await newUser.save();
+    console.log('New user created via Google login');
+    return { user: newUser };
+    
+  } catch (error) {
+    console.error('Google login failed:', error);
+    throw error; // Re-throw the error so service layer can handle it
+  }
 }
+
+
+async findByUserEmail(email: string): Promise<IUser | null> {
+    try {
+      return await this.userModel.findOne({ email }).lean();
+    } catch (error) {
+      throw new Error("Error finding user by email: " + error);
+    }
+  }
+
+  async addCollegeData(collegeData: AddCollegeData): Promise<ICollege> {
+    try {
+      const newCollege = new this.collegeModel(collegeData);
+      const savedCollege = await newCollege.save();
+      return savedCollege.toObject(); // Convert to plain object
+    } catch (error: any) {
+      console.error("Repository Error (addCollegeData):", error);
+      if (error.code === 11000) {
+        throw new Error("College with this email already exists");
+      }
+      throw error;
+    }
+  }
+
+  async findcollegeById(editingId: string): Promise<ICollege | null> {
+    try {
+      return await this.collegeModel.findById(editingId).lean();
+    } catch (error) {
+      console.error("Error finding college by ID:", error);
+      throw new Error("Error finding college by ID");
+    }
+  }
+
+  async findCollegeByName(collegeName: string): Promise<ICollege | null> {
+    try {
+      return await this.collegeModel.findOne({ 
+        collegeName: { $regex: new RegExp(`^${collegeName}$`, 'i') } 
+      }).lean();
+    } catch (error) {
+      console.error("Error finding college by name:", error);
+      throw new Error("Error finding college by name");
+    }
+  }
+
+  async findCollegeByEmail(email: string): Promise<ICollege | null> {
+    try {
+      return await this.collegeModel.findOne({ email: email.toLowerCase() }).lean();
+    } catch (error) {
+      console.error("Error finding college by email:", error);
+      throw new Error("Error finding college by email");
+    }
+  }
+
+  async updateCollege(editingId: string, updateData: UpdateCollegeData): Promise<ICollege> {
+    try {
+      const updatedCollege = await this.collegeModel
+        .findByIdAndUpdate(
+          editingId,
+          { $set: updateData },
+          { new: true, runValidators: true }
+        )
+        .lean();
+      
+      if (!updatedCollege) {
+        throw new Error("College not found");
+      }
+      
+      return updatedCollege;
+    } catch (error: any) {
+      console.error("Repository Error - updateCollege:", error);
+      if (error.code === 11000) {
+        throw new Error("College with this email already exists");
+      }
+      throw error;
+    }
+  }
+
+  async getAllColleges(): Promise<ICollege[]> {
+    try {
+      return await this.collegeModel.find({}).sort({ createdAt: -1 }).lean();
+    } catch (error) {
+      console.error("Error fetching colleges:", error);
+      throw new Error("Failed to fetch colleges");
+    }
+  }
+async getCollegesList(): Promise<ICollege[]> {
+    try {
+      return await this.collegeModel.find({}).sort({ createdAt: -1 }).lean();
+    } catch (error) {
+      console.error("Error fetching colleges:", error);
+      throw new Error("Failed to fetch colleges");
+    }
+  }
+
+  async findUserByEmail(email: string): Promise<IAdminUser | null> {
+    try {
+      return await this.adminUserModel.findOne({ email: email.toLowerCase() }).lean();
+    } catch (error) {
+      console.error("Error finding college by email:", error);
+      throw new Error("Error finding college by email");
+    }
+  }
+  async createUser(userData:IAdminUser): Promise<IAdminUser> {
+    try {
+      const newUser = new this.adminUserModel(userData);
+      const savedUser = await newUser.save();
+      return savedUser.toObject(); // Convert to plain object
+    } catch (error: any) {
+      console.error("Repository Error (addCollegeData):", error);
+      if (error.code === 11000) {
+        throw new Error("College with this email already exists");
+      }
+      throw error;
+    }
+  }
+
+   async findAdminUserById(userId: string): Promise<IAdminUser | null> {
+    try {
+      return await this.adminUserModel.findById(userId).lean();
+    } catch (error) {
+      console.error("Error finding college by ID:", error);
+      throw new Error("Error finding college by ID");
+    }
+  }
+
+  async updateAdminUser(userId: string, updateData: IAdminUser): Promise<IAdminUser> {
+    try {
+      const updatedUser = await this.adminUserModel
+        .findByIdAndUpdate(
+          userId,
+          { $set: updateData },
+          { new: true, runValidators: true }
+        )
+        .lean();
+      
+      if (!updatedUser) {
+        throw new Error("user not found");
+      }
+      
+      return updatedUser;
+    } catch (error: any) {
+      console.error("Repository Error - updateCollege:", error);
+      if (error.code === 11000) {
+        throw new Error("College with this email already exists");
+      }
+      throw error;
+    }
+  }
+
+  async getUsersList(): Promise<IAdminUser[]> {
+    try {
+      return await this.adminUserModel.find({}).sort({ createdAt: -1 }).lean();
+    } catch (error) {
+      console.error("Error fetching userlist:", error);
+      throw new Error("Failed to fetch userlist");
+    }
+  }
+
+  async Check(email: string): Promise<boolean> {
+  try {
+    const user = await this.adminUserModel.findOne({ email }).lean();
+    return !!user; // returns true if user exists, false otherwise
+  } catch (error) {
+    console.error("Error in Check repository:", error);
+    throw new Error("Failed to check email");
+  }
+}
+
+
+
+}
+
 
 export default AdminAuthRepository;

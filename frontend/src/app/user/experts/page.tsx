@@ -6,7 +6,7 @@ import HeroSection from '@/components/user/experts/HeroSection';
 import CounsellorContent from '@/components/user/experts/CounsellorContent';
 
 const ExpertCounsellorsPage: React.FC = () => {
-  const { consultants, loading, error } = useCounsellors();
+  const { consultants, loading, error,totalCount  } = useCounsellors();
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   const handlePageChange = (page: number) => {
@@ -16,7 +16,7 @@ const ExpertCounsellorsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <HeroSection />
+       <HeroSection totalCount={totalCount} />
       <CounsellorContent 
         consultants={consultants}
         loading={loading}

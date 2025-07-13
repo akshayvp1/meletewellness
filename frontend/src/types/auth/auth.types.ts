@@ -5,6 +5,7 @@ export enum UserRole {
 }
 
 export interface IUser {
+    name:string|null
     email: string | null;
     password?: string;
     role: UserRole | null;
@@ -12,8 +13,10 @@ export interface IUser {
 }
 
 export interface AuthState {
-    email: string | null;
-    role: UserRole | null;
-    token: string | null;
-    isAuthenticated: boolean;
+  name: string;
+  email: string;
+  role: UserRole | null;
+  token: string | null;
+  isAuthenticated: boolean;
 }
+

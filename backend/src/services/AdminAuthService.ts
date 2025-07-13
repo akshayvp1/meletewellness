@@ -10,6 +10,9 @@ import { IAdmin } from "../interfaces/IAdmin";
 import AdminAuthRepository from "../repositories/AdminAuthRepository";
 import { IAdminAuthService } from "./interface/IAdminAuthService";
 import { ICounsellor } from "../interfaces/ICounsellor";
+import { IUser } from "../interfaces/IUser";
+import { ICollege } from "../interfaces/ICollege";
+import { IAdminUser } from "../interfaces/IAdminUser";
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
@@ -25,6 +28,12 @@ interface SignInResult {
   accessToken?: string;
   refreshToken?: string;
   user?: Omit<IAdmin, "password">;
+}
+export interface googleSignInResult {
+  user?: IUser;
+  accessToken?: string;
+  refreshToken?: string;
+  // partialUser: boolean;
 }
 
 interface RefreshTokenResult {
@@ -50,10 +59,27 @@ interface ICounsellorData {
   specialization: string;
 }
 
+export interface AddCollegeData {
+  collegeName: string;
+  mobile: string;
+  email: string;
+  isActive: boolean;
+  expiresAt?: Date;
+}
+
+export interface UpdateCollegeData {
+  collegeName?: string;
+  mobile?: string;
+  email?: string;
+  isActive?: boolean;
+  expiresAt?: Date;
+}
+
 @injectable()
 class AdminAuthService implements IAdminAuthService {
   constructor(
-    @inject("AdminAuthRepository") private adminAuthRepository: AdminAuthRepository
+    @inject("AdminAuthRepository") private adminAuthRepository: AdminAuthRepository,
+    
   ) {}
 
   async signIn(email: string, password: string): Promise<SignInResult> {
@@ -208,6 +234,172 @@ class AdminAuthService implements IAdminAuthService {
       throw new Error(error.message || "Failed to update counsellor");
     }
   }
+
+  
+
+  async GoogleLogin(credential: string): Promise<googleSignInResult> {
+  try {
+    // First verify the Google credential and get/create user
+    const result = await this.adminAuthRepository.GoogleLogin(credential);
+    const { user } = result;
+
+    if (!user) {
+      throw new Error("Failed to authenticate user with Google");
+    }
+
+    // Generate tokens for the authenticated user
+    const tokenPayload: ITokenPayload = {
+      id: user._id!.toString(),
+      email: user.email,
+      role: user.role || 'user', // Default role if not set
+    };
+
+    const { accessToken, refreshToken } = generateTokens(tokenPayload);
+
+    return { user, accessToken, refreshToken };
+
+  } catch (error) {
+    console.error("Google Sign-In Error:", error);
+    throw new Error("Failed to authenticate using Google.");
+  }
 }
+
+async addCollegeData(collegeData: AddCollegeData): Promise<ICollege> {
+    try {
+      const existingCollege = await this.adminAuthRepository.findCollegeByName(collegeData.collegeName);
+      if (existingCollege) {
+        throw new Error("College with this name already exists");
+      }
+
+      const existingEmail = await this.adminAuthRepository.findCollegeByEmail(collegeData.email);
+      if (existingEmail) {
+        throw new Error("College with this email already exists");
+      }
+
+      const newCollege = await this.adminAuthRepository.addCollegeData(collegeData);
+      return newCollege;
+    } catch (error: any) {
+      console.error("Service Error (addCollegeData):", error);
+      throw error;
+    }
+  }
+
+  async UpdateCollegeData(editingId: string, updateData: UpdateCollegeData): Promise<ICollege> {
+    try {
+      const college = await this.adminAuthRepository.findcollegeById(editingId);
+      if (!college) {
+        throw new Error("College not found");
+      }
+
+      // Check for duplicate name/email only if they're being updated
+      if (updateData.collegeName && updateData.collegeName !== college.collegeName) {
+        const existingCollege = await this.adminAuthRepository.findCollegeByName(updateData.collegeName);
+        if (existingCollege && existingCollege._id?.toString() !== editingId) {
+          throw new Error("College with this name already exists");
+        }
+      }
+
+      if (updateData.email && updateData.email !== college.email) {
+        const existingEmail = await this.adminAuthRepository.findCollegeByEmail(updateData.email);
+        if (existingEmail && existingEmail._id?.toString() !== editingId) {
+          throw new Error("College with this email already exists");
+        }
+      }
+
+      return await this.adminAuthRepository.updateCollege(editingId, updateData);
+    } catch (error: any) {
+      console.error("Error in UpdateCollegeData service:", error);
+      throw error;
+    }
+  }
+
+  async getAllColleges(): Promise<ICollege[]> {
+    try {
+      const colleges = await this.adminAuthRepository.getAllColleges();
+      return colleges || [];
+    } catch (error: any) {
+      console.error("Error in getAllColleges service:", error);
+      throw new Error("Failed to retrieve colleges");
+    }
+  }
+
+
+
+
+  async getCollegesList(): Promise<ICollege[]> {
+    try {
+      const colleges = await this.adminAuthRepository.getCollegesList();
+      return colleges || [];
+    } catch (error: any) {
+      console.error("Error in getAllColleges service:", error);
+      throw new Error("Failed to retrieve colleges");
+    }
+  }
+  
+  async createUser(userData:IAdminUser): Promise<IAdminUser> {
+    try {
+      
+
+      const existingEmail = await this.adminAuthRepository.findUserByEmail(userData.email);
+      if (existingEmail) {
+        throw new Error("College with this email already exists");
+      }
+
+      const newUser = await this.adminAuthRepository.createUser(userData);
+      return newUser;
+    } catch (error: any) {
+      console.error("Service Error (addCollegeData):", error);
+      throw error;
+    }
+  }
+  
+  async updateAdminUser(userId: string, updateData: IAdminUser): Promise<IAdminUser> {
+    try {
+      const user = await this.adminAuthRepository.findAdminUserById(userId);
+      if (!user) {
+        throw new Error("user not found");
+      }
+
+      return await this.adminAuthRepository.updateAdminUser(userId, updateData);
+    } catch (error: any) {
+      console.error("Error in UpdateCollegeData service:", error);
+      throw error;
+    }
+  }
+
+   async getUsersList(): Promise<IAdminUser[]> {
+    try {
+      const users = await this.adminAuthRepository.getUsersList();
+      return users || [];
+    } catch (error: any) {
+      console.error("Error in getAllColleges service:", error);
+      throw new Error("Failed to retrieve colleges");
+    }
+  }
+  
+  // async getAllColleges(): Promise<ICollege[]> {
+  //   try {
+  //     const colleges = await this.adminAuthRepository.getAllColleges();
+  //     return colleges || [];
+  //   } catch (error: any) {
+  //     console.error("Error in getAllColleges service:", error);
+  //     throw new Error("Failed to retrieve colleges");
+  //   }
+  // }
+
+
+  async Check(email: string): Promise<boolean> {
+  try {
+    const response = await this.adminAuthRepository.Check(email);
+    return response;
+  } catch (error: any) {
+    console.error("Error in Check service:", error);
+    throw new Error("Failed to check email");
+  }
+}
+
+
+  }
+
 
 export default AdminAuthService;

@@ -10,7 +10,10 @@ const userSchema = new Schema<IUser>({
   phoneNumber: {
     type: String,
     trim: true,
-    required: true
+    // required: true
+  },
+  profile:{
+    type:String,
   },
   email: {
     type: String,
@@ -22,11 +25,11 @@ const userSchema = new Schema<IUser>({
   age: {
     type: Number,
     min: 0,
-    required: true
+    // required: true
   },
   password: {
     type: String,
-    required: true
+    // required: true
   },
     role: {
     type: String,

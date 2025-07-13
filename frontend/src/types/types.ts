@@ -130,3 +130,44 @@ export interface TherapyImprovement {
   icon: string;
   bgImage: string;
 }
+
+
+interface CounsellorsApiResponse {
+  counsellors: Consultant[];
+  totalCount: number;
+}
+
+
+
+
+
+//college interface
+
+
+
+export interface ICollege{
+ _id: string;
+  collegeName: string; // Changed from 'name' to 'collegeName' to match your usage
+  mobile?: string; // Optional, as it may not always be present
+  email?: string; // Optional
+  isActive?: boolean; // Optional
+  createdAt?: Date; // Optional
+  expiresAt?: Date; // <- optional expiration field
+}
+
+
+
+
+//adminuser
+
+export interface IAdminUser{
+  _id:string,
+  name: string;
+  phoneNumber: string;
+  email: string;
+  age:number;
+  college:string;
+  isActive: boolean;
+  createdAt: Date;
+  expiresAt?: Date; // <- optional expiration field
+}

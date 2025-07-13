@@ -40,4 +40,15 @@ admin.patch("/unblock-counsellor/:userId", adminAuthenticate, adminAuthControlle
 admin.put("/update-counsellor/:id", adminAuthenticate, adminAuthController.updateCounsellor);
 admin.post("/refresh-token", adminAuthController.refreshToken);
 admin.post('/admin-logout',adminAuthenticate,adminAuthController.adminLogout)
+admin.post("/add-college",adminAuthController.addCollegeData)
+// admin.patch("/update-college/:editingId", adminAuthController.UpdateCollegeData);
+admin.patch("/update-college/:editingId", adminAuthController.UpdateCollegeData); // ✅ correct
+
+admin.get('/get-college',adminAuthController.getAllColleges)
+
+admin.get('/college-list',adminAuthController.getCollegesList)
+admin.post('/create-user',adminAuthController.createUser)
+admin.patch("/update-user/:userId", adminAuthController.updateAdminUser);
+admin.get('/users-list',adminAuthController.getUsersList)
+
 export default admin;
