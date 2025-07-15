@@ -1,4 +1,6 @@
-// src/app/admin/page.tsx
+// src/app/admin/counsellor/page.tsx
+import AdminHome from '@/components/admin/adminHome/home';
+
 export default function AdminHomePage() {
-  return <h1>Admin Dashboard Home</h1>;
+  return <AdminHome />;
 }

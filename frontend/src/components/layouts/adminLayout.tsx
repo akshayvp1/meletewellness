@@ -69,7 +69,7 @@ const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ children })
     try {
       await AuthService.logout();
       localStorage.clear(); 
-      router.push('/admin/signin');
+      router.push('/admin-login');
       toast.success('Successfully logged out!', { duration: 3000, position: 'top-right' });
     } catch (error) {
       console.error('Logout failed:', error);
@@ -83,19 +83,19 @@ const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ children })
     { 
       icon: LayoutDashboard, 
       label: 'Dashboard', 
-      path: '/dashboard/admin-dashboard/home', 
+      path: '/admin/dashboard', 
       mobileVisible: true 
     },
     { 
       icon: Users, 
       label: 'Counsellor Management', 
-      path: '/dashboard/admin-dashboard/counsellorMangement', 
+      path: '/admin/counsellor-management', 
       mobileVisible: true 
     },
     { 
       icon: UserPlus, 
       label: 'Add Counsellor', 
-      path: '', 
+      path: '/admin/counsellor', 
       mobileVisible: true 
     },
     { 
@@ -107,7 +107,7 @@ const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ children })
     { 
       icon: Users, 
       label: 'College Management', 
-      path: '/admin/college-management', 
+      path: '/admin/add-colleges', 
       mobileVisible: true 
     },
     

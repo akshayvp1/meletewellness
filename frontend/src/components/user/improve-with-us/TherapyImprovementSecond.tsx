@@ -1,3 +1,8 @@
+
+
+
+
+
 // 'use client';
 
 // import React, { useState } from 'react';
@@ -68,13 +73,15 @@
 //         </h2>
 //         <div className="relative">
 //           <motion.div
-//             className="flex flex-row overflow-x-auto md:grid md:grid-cols-4 gap-6 snap-x snap-mandatory pb-4"
+//             className="
+//               flex flex-col gap-6
+//               md:grid md:grid-cols-4 md:gap-6
+//             "
 //             variants={containerVariants}
 //             initial="hidden"
 //             animate="visible"
 //           >
-//            {therapyImprovements.map((item: TherapyImprovement, index: number) => (
-
+//             {therapyImprovements.map((item: TherapyImprovement, index: number) => (
 //               <TherapyCard
 //                 key={item.title}
 //                 item={item}
@@ -97,58 +104,66 @@
 
 
 
+
+
+
+
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import { therapyImprovements } from './therapyData';
 import TherapyCard from './TherapyCard';
 import ScrollIndicators from './ScrollIndicators';
-// import ShowMoreButton from './ShowMoreButton';
+import LoadingSpinner from '@/components/loading/LoadingSpinner'; 
 import type { TherapyImprovement } from '../../../types/types';
 
-// Define animation variants properly with correct typing
+// Animation Variants
 const sectionVariants: Variants = {
-  hidden: { 
-    opacity: 0, 
-    y: 50 
-  },
+  hidden: { opacity: 0, y: 50 },
   visible: { 
     opacity: 1, 
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeOut"
-    }
-  }
+    y: 0, 
+    transition: { duration: 0.6, ease: 'easeOut' }
+  },
 };
 
 const containerVariants: Variants = {
-  hidden: { 
-    opacity: 0 
-  },
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2
-    }
-  }
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+  },
 };
 
 const TherapyImprovementsSection: React.FC = () => {
   const [activeCard, setActiveCard] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true); // ✅ Loading state
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 10000); // 5 seconds delay
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleCardClick = (index: number) => {
     setActiveCard(activeCard === index ? null : index);
   };
 
-  // Fallback if therapyImprovements is not available
   if (!therapyImprovements || !Array.isArray(therapyImprovements)) {
     console.error('therapyImprovements is not defined or not an array');
     return null;
   }
 
+  // ✅ Show spinner during loading
+  if (loading) {
+    return (
+      <div className="py-20">
+        <LoadingSpinner/>
+      </div>
+    );
+  }
+
+  // ✅ Render actual section after loading
   return (
     <motion.section
       className="py-16 bg-gradient-to-br from-slate-50 via-white to-emerald-50"
@@ -167,10 +182,7 @@ const TherapyImprovementsSection: React.FC = () => {
         </h2>
         <div className="relative">
           <motion.div
-            className="
-              flex flex-col gap-6
-              md:grid md:grid-cols-4 md:gap-6
-            "
+            className="flex flex-col gap-6 md:grid md:grid-cols-4 md:gap-6"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -187,7 +199,6 @@ const TherapyImprovementsSection: React.FC = () => {
           </motion.div>
           <ScrollIndicators />
         </div>
-        {/* <ShowMoreButton /> */}
       </div>
     </motion.section>
   );

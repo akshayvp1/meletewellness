@@ -1,4 +1,4 @@
-
+"use client"
 import React from 'react';
 import LoadingState from '@/components/loading/LoadingSpinner';
 import ErrorState from '@/components/user/experts/ErrorState';
