@@ -850,6 +850,8 @@ const LoginCard: React.FC<LoginCardProps> = ({ onSubmit, className = "" }) => {
     setShowPassword(false);
     setShowConfirmPassword(false);
   };
+  console.log("hello");
+  
 
   return (
     <div
@@ -887,7 +889,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ onSubmit, className = "" }) => {
                   ? "Create your account and start your journey with us"
                   : "Sign in to continue to your account and explore amazing features"}
               </p>
-
+   
               <button
                 onClick={toggleMode}
                 className="px-6 lg:px-8 py-3 border-2 border-white text-white font-semibold rounded-full hover:bg-white hover:text-green-800 transition-colors duration-300"
