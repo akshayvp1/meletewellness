@@ -166,8 +166,8 @@ import axios, {
   InternalAxiosRequestConfig,
   AxiosError,
 } from "axios";
-import { store } from "../store/app/store";
-import { setToken } from "../store/features/authSlice";
+import { store } from "@/store/app/store";
+import { setToken } from "@/store/features/authSlice";
 
 const API_URLS = {
   user: process.env.NEXT_PUBLIC_API_USER || "",
@@ -175,9 +175,9 @@ const API_URLS = {
   counsellor: process.env.NEXT_PUBLIC_API_COUNSELLOR || "",
 } as const;
 
-if (!API_URLS.user || !API_URLS.admin || !API_URLS.counsellor) {
-  throw new Error("API URL missing in environment variables");
-}
+// if (!API_URLS.user || !API_URLS.admin || !API_URLS.counsellor) {
+//   throw new Error("API URL missing in environment variables");
+// }
 
 export type UserRole = keyof typeof API_URLS;
 
