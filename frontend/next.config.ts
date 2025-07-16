@@ -14,6 +14,9 @@ module.exports = {
       {
         source: '/api/:path*',
         destination: 'http://localhost:4040/api/:path*',
+        images: {
+    unoptimized: true, // disables sharp optimization
+  },
       },
     ];
   },

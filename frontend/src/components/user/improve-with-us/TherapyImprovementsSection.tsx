@@ -10,7 +10,7 @@ import { therapyImprovements } from './therapyData';
 import TherapyCard from './TherapyCard';
 import ScrollIndicators from './ScrollIndicators';
 import ShowMoreButton from './ShowMoreButton';
-import type { TherapyImprovement } from '../../../types/types';
+import type { TherapyImprovement } from '@/types/types';
 
 // Define animation variants properly with correct typing
 const sectionVariants: Variants = {

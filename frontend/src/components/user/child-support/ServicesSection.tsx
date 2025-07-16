@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Smile, Shield, Heart, Users } from 'lucide-react';
-import { useIntersectionObserver } from '../../hooks/useIntersectionObserver';
+import { useIntersectionObserver } from '@/components/hooks/useIntersectionObserver';
 import AnimatedSection from '@/components/user/child-support/AnimatedSection';
 import ServiceCard from './ServiceCard';
 
