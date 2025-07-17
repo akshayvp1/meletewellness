@@ -524,19 +524,21 @@ const Navbar: React.FC = () => {
 
               {/* Mobile Login/User Button */}
               <div className="border-t border-gray-200 pt-4 mt-6 space-y-3">
-                {auth.name ? (
-                  <div className="flex items-center space-x-3 w-full px-4 py-3 text-lg font-semibold text-gray-800 rounded-lg bg-gray-50">
-                    <User className="w-5 h-5" />
-                    <span>{auth.name}</span>
-                  </div>
-                ) : (
+                {
+                // auth.name ? (
+                //   <div className="flex items-center space-x-3 w-full px-4 py-3 text-lg font-semibold text-gray-800 rounded-lg bg-gray-50">
+                //     <User className="w-5 h-5" />
+                //     <span>{auth.name}</span>
+                //   </div>
+                // ) : 
+                (
                   <Link
                     href="/user/login"
                     className="flex items-center space-x-3 w-full px-4 py-3 text-lg font-semibold text-gray-800 hover:text-emerald-700 transition-colors duration-300 rounded-lg hover:bg-gray-50"
                     onClick={handleMobileMenuClose}
                   >
                     <LogIn className="w-5 h-5" />
-                    <span>Login</span>
+                    {/* <span>Login</span> */}
                   </Link>
                 )}
               </div>
