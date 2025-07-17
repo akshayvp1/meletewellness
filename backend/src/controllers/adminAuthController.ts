@@ -298,7 +298,7 @@ class AdminAuthController implements IAdminAuthController {
 
 GoogleLogin = async (req: Request, res: Response): Promise<void> => {
   try {
-    console.log("🥰🥰🥰 Google Login Request");
+    
     
     const { credential } = req.body;
 
