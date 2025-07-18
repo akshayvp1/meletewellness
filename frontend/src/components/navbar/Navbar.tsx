@@ -437,12 +437,12 @@ const Navbar: React.FC = () => {
             {/* Desktop Login/User Button */}
             <div className="flex items-center space-x-3">
               {
-              // auth.name ? (
-              //   <div className="flex items-center space-x-2 px-4 py-2 text-gray-800 font-semibold text-base rounded-lg bg-gray-50">
-              //     <User className="w-4 h-4" />
-              //     <span>{auth.name}</span>
-              //   </div>
-              // ) :
+              auth.name ? (
+                <div className="flex items-center space-x-2 px-4 py-2 text-gray-800 font-semibold text-base rounded-lg bg-gray-50">
+                  <User className="w-4 h-4" />
+                  <span>{auth.name}</span>
+                </div>
+              ) :
               
               (
                 <Link
@@ -452,7 +452,8 @@ const Navbar: React.FC = () => {
                   <LogIn className="w-4 h-4" />
                   {/* <span>Login</span> */}
                 </Link>
-              )}
+              )
+              }
             </div>
           </div>
         </div>
@@ -525,12 +526,12 @@ const Navbar: React.FC = () => {
               {/* Mobile Login/User Button */}
               <div className="border-t border-gray-200 pt-4 mt-6 space-y-3">
                 {
-                // auth.name ? (
-                //   <div className="flex items-center space-x-3 w-full px-4 py-3 text-lg font-semibold text-gray-800 rounded-lg bg-gray-50">
-                //     <User className="w-5 h-5" />
-                //     <span>{auth.name}</span>
-                //   </div>
-                // ) : 
+                auth.name ? (
+                  <div className="flex items-center space-x-3 w-full px-4 py-3 text-lg font-semibold text-gray-800 rounded-lg bg-gray-50">
+                    <User className="w-5 h-5" />
+                    <span>{auth.name}</span>
+                  </div>
+                ) : 
                 (
                   <Link
                     href="/user/login"

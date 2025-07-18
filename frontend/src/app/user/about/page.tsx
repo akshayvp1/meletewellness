@@ -22,7 +22,7 @@ const AboutPage: React.FC = () => {
         />
       </Head>
 
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-white pt-7">
         <HeroSection />
         <MissionVisionSection />
         <WhyChooseSection />

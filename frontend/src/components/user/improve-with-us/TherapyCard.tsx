@@ -86,7 +86,7 @@ const TherapyCard: React.FC<TherapyCardProps> = ({
         }`}
       ></div>
       
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-white">
+      <div className="relative z-10 flex flex-col items-center   text-white">
         <div className="mb-5">
           {IconComponent ? <IconComponent style={{ color: '#31A382' }} /> : null}
         </div>
@@ -101,7 +101,7 @@ const TherapyCard: React.FC<TherapyCardProps> = ({
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.4 }}
             >
-              <div className="max-h-full overflow-y-auto scrollbar-thin scrollbar-thumb-[#31A382] scrollbar-track-transparent px-2">
+              <div className="max-h-full">
                 {item.desc}
               </div>
             </motion.div>

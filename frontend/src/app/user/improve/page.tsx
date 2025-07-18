@@ -19,7 +19,7 @@ const ExpertCounsellorsPage: React.FC = () => {
         />
       </Head>
 
-      <div>
+      <div className='pt-7'>
         <TherapyImprovementsSection />
       </div>
     </>

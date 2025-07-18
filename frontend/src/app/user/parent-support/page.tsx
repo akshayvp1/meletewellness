@@ -23,7 +23,7 @@ const ParentSupportPage: React.FC = () => {
         />
       </Head>
 
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-white pt-7">
         <HeroSection parentImage={ParentImage.src} />
         <ServicesSection />
         <ApproachSection />
