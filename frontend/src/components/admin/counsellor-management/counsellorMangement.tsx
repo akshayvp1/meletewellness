@@ -4,7 +4,7 @@ import { Star, Users, Clock, MapPin, Lock, Unlock, Edit } from 'lucide-react';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cropper from 'react-easy-crop';
-import AuthService from '@/services/AuthService';
+import CounsellorManagingService from '@/services/admin/CounsellorManagingService';
 
 interface Consultant {
   id: string;
@@ -37,7 +37,7 @@ const CounsellorCard: React.FC<CounsellorCardProps> = ({ consultant, onToggleBlo
   const handleBlockCounsellor = async (counsellorId: string) => {
     try {
       console.log('Attempting to block counsellor:', counsellorId);
-      const updatedCounsellor = await AuthService.blockCounsellor(counsellorId);
+      const updatedCounsellor = await CounsellorManagingService.blockCounsellor(counsellorId);
       console.log('Block successful:', updatedCounsellor);
       setShowConfirm(null);
       onToggleBlock(counsellorId, updatedCounsellor);
@@ -59,7 +59,7 @@ const CounsellorCard: React.FC<CounsellorCardProps> = ({ consultant, onToggleBlo
   const handleUnblockCounsellor = async (counsellorId: string) => {
     try {
       console.log('Attempting to unblock counsellor:', counsellorId);
-      const updatedCounsellor = await AuthService.unblockCounsellor(counsellorId);
+      const updatedCounsellor = await CounsellorManagingService.unblockCounsellor(counsellorId);
       console.log('Unblock successful:', updatedCounsellor);
       setShowConfirm(null);
       onToggleBlock(counsellorId, updatedCounsellor);
@@ -446,7 +446,7 @@ const EditCounsellorForm: React.FC<EditCounsellorFormProps> = ({ consultant, onC
         isBlocked: consultant.isBlocked,
       };
 
-      await AuthService.updateCounsellor(consultant.id, updatedData);
+      await CounsellorManagingService.updateCounsellor(consultant.id, updatedData);
       toast.success('Counsellor updated successfully.', {
         position: 'top-right',
         autoClose: 3000,
@@ -807,7 +807,7 @@ const CounsellorManagement: React.FC = () => {
     const fetchCounsellors = async () => {
       try {
         setLoading(true);
-        const response = await AuthService.getCounsellors();
+        const response = await CounsellorManagingService.getCounsellors();
         setConsultants(response);
       } catch (err: any) {
         const errorMessage = err.message || 'Failed to load counsellors.';

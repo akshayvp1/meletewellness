@@ -1,9 +1,9 @@
 "use client"
 import { useState, useEffect } from 'react';
 import { Calendar, User, Phone, Mail, ToggleLeft, ToggleRight, Clock, GraduationCap, Search, Edit2, Ban, Check, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import AuthService from '@/services/AuthService';
+import UserManagingService from '@/services/admin/UserManagingService';
 import { ICollege } from '@/types/types';
-
+import CollegeManagingService from '@/services/admin/CollegeManagingService';
 export interface IAdminUser {
   _id: string;
   name: string;
@@ -68,7 +68,7 @@ const AdminUserManagement = () => {
       setLoading(true);
       setError(null);
       
-      const userData = await AuthService.getUsersList();
+      const userData = await UserManagingService.getUsersList();
       
       // Transform the data to ensure dates are proper Date objects
       const transformedData = transformUserData(userData);
@@ -85,7 +85,7 @@ const AdminUserManagement = () => {
 
  const loadColleges = async () => {
   try {
-    const collegesList = await AuthService.getCollegesList();
+    const collegesList = await CollegeManagingService.getCollegesList();
     // Map ICollege[] to string[] by extracting the collegeName property
     setColleges(collegesList.map((college: ICollege) => college.collegeName));
   } catch (err) {
@@ -162,7 +162,7 @@ const AdminUserManagement = () => {
         expiresAt: formData.expiresAt
       };
       
-      await AuthService.createUser(userData as IAdminUser);
+      await UserManagingService.createUser(userData as IAdminUser);
       
       // Reload users after successful creation
       await loadUsers();
@@ -213,7 +213,7 @@ const AdminUserManagement = () => {
         expiresAt: formData.expiresAt
       };
       
-      await AuthService.updateAdminUser(editingUser._id, updateData as IAdminUser);
+      await UserManagingService.updateAdminUser(editingUser._id, updateData as IAdminUser);
       
       // Reload users after successful update
       await loadUsers();
@@ -261,7 +261,7 @@ const AdminUserManagement = () => {
         expiresAt: user.expiresAt
       };
       
-      await AuthService.updateAdminUser(userId, updateData as IAdminUser);
+      await UserManagingService.updateAdminUser(userId, updateData as IAdminUser);
       
       // Reload users to get fresh data from server
       await loadUsers();

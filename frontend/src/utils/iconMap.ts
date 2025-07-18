@@ -13,9 +13,11 @@ import {
   Target,
   Heart,
   HeartHandshake,
-} from 'lucide-react';
+} from "lucide-react";
 
-export const iconMap: { [key: string]: React.ComponentType<{ style: React.CSSProperties }> } = {
+export const iconMap: {
+  [key: string]: React.ComponentType<{ style: React.CSSProperties }>;
+} = {
   Star,
   Brain,
   AlertTriangle,

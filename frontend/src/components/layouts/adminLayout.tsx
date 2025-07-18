@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { LayoutDashboard, Users, UserPlus, HelpCircle, LogOut, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import companyLogo from '@/../public/assets/logoWhite.png';
-import AuthService from '../../services/AuthService';
+import AdminAuthService from '@/services/admin/AdminAuthService';
 
 // Utility for className merging (replacement for cn)
 const cn = (...classes: (string | undefined | null | false)[]): string => {
@@ -67,7 +67,7 @@ const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ children })
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
-      await AuthService.logout();
+      await AdminAuthService.logout();
       localStorage.clear(); 
       router.push('/admin-login');
       toast.success('Successfully logged out!', { duration: 3000, position: 'top-right' });

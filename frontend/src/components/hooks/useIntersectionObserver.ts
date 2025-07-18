@@ -3,11 +3,11 @@
 import { useState, useEffect, useRef } from 'react';
 
 export const useIntersectionObserver = (threshold: number = 0.1) => {
-  const elementRef = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const element = elementRef.current;
+    const element = ref.current;
     if (!element) return;
 
     const observer = new IntersectionObserver(
@@ -25,5 +25,5 @@ export const useIntersectionObserver = (threshold: number = 0.1) => {
     return () => observer.disconnect();
   }, [threshold]);
 
-  return [elementRef, isVisible] as const;
+  return [ref, isVisible] as const;
 };

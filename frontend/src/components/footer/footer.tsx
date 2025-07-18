@@ -64,12 +64,12 @@ const Footer: React.FC = () => {
           >
             Terms of Service
           </Link>
-          <Link
+          {/* <Link
             href="/contact"
             className="text-gray-600 hover:text-[#015F4A] transition-colors duration-300"
           >
             Contact Us
-          </Link>
+          </Link> */}
         </div>
       </div>
     </motion.footer>

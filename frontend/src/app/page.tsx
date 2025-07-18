@@ -2,7 +2,7 @@
 
 "use client";
 import React, { useCallback } from 'react';
-import Improve from "@/components/user/melete-provide/meleteProvide";
+import Improve from "@/components/user/melete-provide/SupportGroups";
 import TherapyImprovementsSection from "@/components/user/improve-with-us/TherapyImprovementsSection";
 import Experts from "@/components/user/experts/ExpertCounsellors"
 import WhatWeOffer from '@/components/user/service/what-we-offer';

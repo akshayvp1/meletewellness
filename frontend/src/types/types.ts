@@ -171,3 +171,48 @@ export interface IAdminUser{
   createdAt: Date;
   expiresAt?: Date; // <- optional expiration field
 }
+
+
+
+
+
+
+
+
+//improve
+
+
+export interface SupportGroup {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  icon: LucideIcon;
+  features: string[];
+  color: string;
+  path: string;
+}
+
+export interface SupportGroupCardProps {
+  group: SupportGroup;
+  index: number;
+  isVisible: boolean;
+  onClick: (group: SupportGroup) => void;
+}
+
+export interface MobileCarouselProps {
+  groups: SupportGroup[];
+  currentSlide: number;
+  onServiceClick: (group: SupportGroup) => void;
+  swipeHandlers: {
+    onTouchStart: (e: React.TouchEvent) => void;
+    onTouchMove: (e: React.TouchEvent) => void;
+    onTouchEnd: () => void;
+  };
+}
+
+export interface DesktopGridProps {
+  groups: SupportGroup[];
+  isVisible: boolean;
+  onServiceClick: (group: SupportGroup) => void;
+}

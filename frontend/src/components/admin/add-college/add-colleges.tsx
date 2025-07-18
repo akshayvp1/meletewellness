@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Save, X, Loader2, School, Phone, Mail, Calendar, CheckCircle, XCircle } from 'lucide-react';
-import AuthService from '@/services/AuthService';
+import CollegeManagingService from '@/services/admin/CollegeManagingService';
 import { ICollege as MeleteICollege } from '@/types/types';
 
 const CollegeManagement = () => {
@@ -29,7 +29,7 @@ const CollegeManagement = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const collegeData = await AuthService.getAllColleges();
+      const collegeData = await CollegeManagingService.getAllColleges();
       console.log('collegeData:', collegeData); // Debug
       
       // Ensure the data conforms to MeleteICollege interface
@@ -81,7 +81,7 @@ const CollegeManagement = () => {
       };
 
       if (editingId) {
-        const updatedCollegeResponse = await AuthService.updateCollegeData(editingId, collegeData);
+        const updatedCollegeResponse = await CollegeManagingService.updateCollegeData(editingId, collegeData);
         console.log('updatedCollege:', updatedCollegeResponse); // Debug
         
         // Ensure the response conforms to MeleteICollege interface
@@ -102,7 +102,7 @@ const CollegeManagement = () => {
         setEditingId(null);
         alert('College updated!');
       } else {
-        const addedCollegeResponse = await AuthService.addCollegeData(collegeData);
+        const addedCollegeResponse = await CollegeManagingService.addCollegeData(collegeData);
         console.log('addedCollege:', addedCollegeResponse); // Debug
         
         // Ensure the response conforms to MeleteICollege interface

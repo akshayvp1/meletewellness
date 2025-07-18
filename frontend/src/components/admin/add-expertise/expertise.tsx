@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { Plus, Edit2, Trash2, Search, Save, X } from 'lucide-react';
-import AuthService from '@/services/AuthService';
+import ExpertiseManagingService from '@/services/admin/ExpertiseManagingService';
 interface ExpertiseArea {
   id: string;
   name: string;
@@ -30,7 +30,7 @@ const ExpertiseAdmin = () => {
   const handleCreate = async () => {
     setIsLoading(true);
     try {
-      const result = await AuthService.addExpertise({
+      const result = await ExpertiseManagingService.addExpertise({
         name: formData.name,
         description: formData.description,
         isActive: formData.isActive
@@ -71,7 +71,7 @@ const ExpertiseAdmin = () => {
     
     setIsLoading(true);
     try {
-      const result = await AuthService.updateExpertise(editingExpertise.id, {
+      const result = await ExpertiseManagingService.updateExpertise(editingExpertise.id, {
         name: formData.name,
         description: formData.description,
         isActive: formData.isActive
@@ -103,7 +103,7 @@ const ExpertiseAdmin = () => {
   const handleDelete = async (id: string) => {
     setIsLoading(true);
     try {
-      const result = await AuthService.deleteExpertise(id);
+      const result = await ExpertiseManagingService.deleteExpertise(id);
       
       if (result.success) {
         setExpertiseAreas(expertiseAreas.filter(exp => exp.id !== id));

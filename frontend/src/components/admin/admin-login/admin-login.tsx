@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { HiOutlineMail, HiOutlineLockClosed } from 'react-icons/hi';
-import AuthService from '@/services/AuthService'; // Adjust the path as needed
+import AdminAuthService from '@/services/admin/AdminAuthService'; // Adjust the path as needed
 import { useRouter } from 'next/navigation';
 
 interface FormErrors {
@@ -50,9 +50,9 @@ const AdminLogin: React.FC = () => {
 
     setIsLoading(true);
     try {
-      console.log(email, "jjjjjjj");
-      const response = await AuthService.login(email, password);
-      console.log('Login successful:', response);
+      
+      const response = await AdminAuthService.login(email, password);
+     
       setEmail('');
       setPassword('');
       setErrors({});

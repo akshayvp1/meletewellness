@@ -22,7 +22,7 @@ import {
   Shield,
   ShieldOff
 } from 'lucide-react';
-import AuthService from '@/services/AuthService';
+import CounsellorManagingService from '@/services/admin/CounsellorManagingService';
 import { Consultant } from '@/types/types';
 
 // Interface definitions
@@ -56,7 +56,7 @@ const AdminHome: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await AuthService.getCounsellors();
+        const data = await CounsellorManagingService.getCounsellors();
         setConsultants(data);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch counsellors');
@@ -162,13 +162,13 @@ const AdminHome: React.FC = () => {
       const isBlocked = Boolean(consultant.isBlocked);
       
       if (isBlocked) {
-        await AuthService.unblockCounsellor(consultant.id);
+        await CounsellorManagingService.unblockCounsellor(consultant.id);
       } else {
-        await AuthService.blockCounsellor(consultant.id);
+        await CounsellorManagingService.blockCounsellor(consultant.id);
       }
       
       // Refresh the consultants list
-      const updatedConsultants = await AuthService.getCounsellors();
+      const updatedConsultants = await CounsellorManagingService.getCounsellors();
       setConsultants(updatedConsultants);
     } catch (err: any) {
       setError(err.message || 'Failed to update counsellor status');

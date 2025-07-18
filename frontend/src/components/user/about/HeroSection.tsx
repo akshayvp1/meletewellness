@@ -14,7 +14,7 @@ const HeroSection: React.FC = () => {
           </Badge>
           
           <h1 className="text-5xl lg:text-7xl font-light mb-6 leading-tight text-gray-900">
-            Welcome to <span className="text-5xl font-inter font-normal text-[#1ca184]">MELETE</span>
+            Welcome to <span className="text-5xl font-inter font-normal text-[#1ca184]">Melete</span>
           </h1>
           
           <p className="text-xl lg:text-2xl mb-8 text-gray-600 leading-relaxed max-w-4xl mx-auto font-light">

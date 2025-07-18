@@ -435,7 +435,7 @@ const Navbar: React.FC = () => {
             ))}
 
             {/* Desktop Login/User Button */}
-            <div className="flex items-center space-x-3">
+            {/* <div className="flex items-center space-x-3">
               {
               auth.name ? (
                 <div className="flex items-center space-x-2 px-4 py-2 text-gray-800 font-semibold text-base rounded-lg bg-gray-50">
@@ -450,11 +450,11 @@ const Navbar: React.FC = () => {
                   className="flex items-center space-x-2 px-4 py-2 text-gray-800 font-semibold text-base hover:text-emerald-700 transition-colors duration-300 rounded-lg hover:bg-gray-50"
                 >
                   <LogIn className="w-4 h-4" />
-                  {/* <span>Login</span> */}
+                  <span>Login</span>
                 </Link>
               )
               }
-            </div>
+            </div> */}
           </div>
         </div>
       </nav>
@@ -539,7 +539,7 @@ const Navbar: React.FC = () => {
                     onClick={handleMobileMenuClose}
                   >
                     <LogIn className="w-5 h-5" />
-                    {/* <span>Login</span> */}
+                    <span>Login</span>
                   </Link>
                 )}
               </div>
