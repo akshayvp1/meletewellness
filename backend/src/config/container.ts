@@ -8,11 +8,13 @@ import AdminAuthController from '../controllers/adminAuthController';
 import CounsellorModel from '../models/counsellorModel'
 import { AdminUser } from '../models/adminUser';
 import { College } from '../models/collegeModel';
+import Expertise from '../models/Expertise';
 
 container.register("UserModel", { useValue: User });
 container.register("CounsellorModel",{useValue:CounsellorModel})
 container.register("AdminModel", { useValue: AdminModel });
 container.register("CollegeModel",{useValue:College})
+container.register("ExpertiseModel",{useValue:Expertise})
 container.register("AdminUserModel",{useValue:AdminUser})
 container.register("AdminAuthController", AdminAuthController);
 container.register("AdminAuthService", AdminAuthService);

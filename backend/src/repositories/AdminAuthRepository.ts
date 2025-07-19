@@ -9,6 +9,7 @@ import { IUser } from "../interfaces/IUser";
 import { OAuth2Client } from "google-auth-library";
 import { ICollege } from "../interfaces/ICollege";
 import { IAdminUser } from "../interfaces/IAdminUser";
+import { IExpertise } from "../interfaces/IExpertise";
 
 interface ICounsellorData {
   name: string;
@@ -47,18 +48,21 @@ class AdminAuthRepository implements IAdminAuthRepository {
     private readonly userModel:Model<IUser>;
     private readonly collegeModel:Model<ICollege>
     private readonly adminUserModel:Model<IAdminUser>
+    private readonly expertiseModel:Model<IExpertise> 
     constructor(
         @inject("AdminModel") adminModel: Model<IAdmin>,
         @inject("CounsellorModel") counsellorModel: Model<ICounsellor>,
         @inject("UserModel")userModel:Model<IUser>,
         @inject("CollegeModel")collegeModel:Model<ICollege>,
-        @inject("AdminUserModel")adminUserModel:Model<IAdminUser>
+        @inject("AdminUserModel")adminUserModel:Model<IAdminUser>,
+        @inject("ExpertiseModel") expertiseModel: Model<IExpertise>
     ) {
         this.adminModel = adminModel;
         this.counsellorModel = counsellorModel;
         this.userModel = userModel
         this.collegeModel = collegeModel
         this.adminUserModel=adminUserModel
+        this.expertiseModel = expertiseModel;
     }
 
     async findByEmail(email: string): Promise<IAdmin | null> {
@@ -381,6 +385,83 @@ async getCollegesList(): Promise<ICollege[]> {
     } catch (error) {
       console.error("Error fetching userlist:", error);
       throw new Error("Failed to fetch userlist");
+    }
+  }
+
+   async getExpertise(): Promise<IAdminUser[]> {
+    try {
+      return await this.adminUserModel.find({}).sort({ createdAt: -1 }).lean();
+    } catch (error) {
+      console.error("Error fetching expertiselist:", error);
+      throw new Error("Failed to fetch expertiselist");
+    }
+  }
+
+  findExpertiseByName(name: string): Promise<IExpertise | null> {
+    try{
+      return this.expertiseModel.findOne({ name: name.toLowerCase() }).lean();
+    }
+    catch (error) {
+      console.error("Error finding expertise by name:", error);
+      throw new Error("Error finding expertise by name");
+    }
+  }
+
+  addExpertise(expertiseData: IExpertise): Promise<IExpertise> {
+    try {
+      const newExpertise = new this.expertiseModel(expertiseData);
+      return newExpertise.save();
+      }catch (error: any) {
+      console.error("Repository Error (addExpertise):", error);
+      throw new Error("Error finding expertise by name");
+    }
+  }
+  findExpertiseById(id: string): Promise<IExpertise | null> {
+    try {
+      return this.expertiseModel.findById(id).lean();
+    }catch (error) {
+      console.error("Error finding expertise by ID:", error); 
+      throw new Error("Error finding expertise by ID");
+    }
+  }
+  async updateExpertise(id: string, expertiseData: IExpertise): Promise<IExpertise> {
+    try {
+      const updatedExpertise = await this.expertiseModel
+        .findByIdAndUpdate(
+          id,
+          { $set: expertiseData },
+          { new: true, runValidators: true }
+        )
+        .lean();
+      
+      if (!updatedExpertise) {
+        throw new Error("Expertise not found");
+      }
+      
+      return updatedExpertise;
+    } catch (error: any) {
+      console.error("Repository Error - updateExpertise:", error);
+      throw new Error(error instanceof Error ? error.message : "Failed to update expertise");
+    }
+  } 
+  blockExpertise(id: string): Promise<IExpertise | null> {
+    try {
+      return this.expertiseModel
+        .findByIdAndUpdate(id, { isActive: false }, { new: true })
+        .lean();
+    }catch (error) {
+      console.error("Error blocking expertise:", error);
+      throw new Error("Failed to block expertise");
+    }
+  }
+  unBlockExpertise(id: string): Promise<IExpertise | null> {
+    try {
+      return this.expertiseModel
+        .findByIdAndUpdate(id, { isActive: true }, { new: true })
+        .lean();
+    }catch (error) {
+      console.error("Error unblocking expertise:", error);
+      throw new Error("Failed to unblock expertise");
     }
   }
 

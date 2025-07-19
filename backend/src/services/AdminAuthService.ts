@@ -13,7 +13,7 @@ import { ICounsellor } from "../interfaces/ICounsellor";
 import { IUser } from "../interfaces/IUser";
 import { ICollege } from "../interfaces/ICollege";
 import { IAdminUser } from "../interfaces/IAdminUser";
-
+import { IExpertise } from "../interfaces/IExpertise";
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
@@ -377,16 +377,68 @@ async addCollegeData(collegeData: AddCollegeData): Promise<ICollege> {
     }
   }
   
-  // async getAllColleges(): Promise<ICollege[]> {
-  //   try {
-  //     const colleges = await this.adminAuthRepository.getAllColleges();
-  //     return colleges || [];
-  //   } catch (error: any) {
-  //     console.error("Error in getAllColleges service:", error);
-  //     throw new Error("Failed to retrieve colleges");
-  //   }
-  // }
+  async getExpertise(): Promise<IAdminUser[]> {
+    try {
+      const expertises = await this.adminAuthRepository.getExpertise();
+      return expertises || [];
+    } catch (error: any) {
+      console.error("Error in expertise service:", error);
+      throw new Error("Failed to retrieve expertise");
+    }
+  }
+  async addExpertise(expertiseData: IExpertise): Promise<IExpertise> {
+  try {
+    const name = expertiseData.name
+    const existingexpertise = await this.adminAuthRepository.findExpertiseByName(name);
+      if (existingexpertise) {
+        throw new Error("expertise already exists");
+      }
+      const expertise = await this.adminAuthRepository.addExpertise(expertiseData);
+      return expertise
+    } catch (error: any) {
+      console.error("Error in expertise service:", error);
+      throw new Error("Failed to retrieve expertise");
+    }
+ }
+async updateExpertise(id: string, expertiseData: IExpertise): Promise<IExpertise> {
+  try {
+    const expertise = await this.adminAuthRepository.findExpertiseById(id);
+    if (!expertise) {
+      throw new Error("Expertise not found");
+    }
+     return await this.adminAuthRepository.updateExpertise(id, expertiseData);
 
+  }
+  catch(error: any) {
+    console.error("Error in expertise service:", error);
+    throw new Error("Failed to update expertise");
+  }
+}
+async blockExpertise(id: string): Promise<IExpertise | null> {
+try{
+   const expertise = await this.adminAuthRepository.findExpertiseById(id);
+      if (!expertise) {
+        throw new Error("expertise not found");
+      }
+  return this.adminAuthRepository.blockExpertise(id);
+}catch(error: any) {
+  console.error("Error in expertise service:", error);
+  throw new Error("Failed to block expertise");
+}
+}
+
+async unBlockExpertise(id: string): Promise<IExpertise | null> {
+  try {
+    const expertise = await this.adminAuthRepository.findExpertiseById(id);
+    if (!expertise) {
+      throw new Error("expertise not found");
+    }
+    return this.adminAuthRepository.unBlockExpertise(id);
+  }catch (error: any) {
+    console.error("Error in expertise service:", error);
+    throw new Error("Failed to unblock expertise");
+  }
+  }
 
   async Check(email: string): Promise<boolean> {
   try {

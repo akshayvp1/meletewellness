@@ -8,13 +8,26 @@ interface ExpertiseData {
   isActive: boolean;
 }
 
+interface ExpertiseArea {
+  id: string;
+  name: string;
+  description: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 class ExpertiseManagingService {
+  
   async addExpertise(
     expertiseData: ExpertiseData
-  ): Promise<{ success: boolean; id: string }> {
+  ): Promise<{ success: boolean;}> {
     try {
       const response = await api["admin"].post("/add-expertise", expertiseData);
-      return { success: true, id: response.data.id || Date.now().toString() };
+      if (response.status !== 200) {
+        throw new Error("Failed to add expertise");
+      }
+      return { success: true };
     } catch (error: any) {
       throw new Error(
         error.response?.data?.message || "Failed to add expertise"
@@ -36,13 +49,39 @@ class ExpertiseManagingService {
     }
   }
 
-  async deleteExpertise(id: string): Promise<{ success: boolean }> {
+  async blockExpertise(id: string): Promise<{ success: boolean }> {
     try {
-      await api["admin"].delete(`/delete-expertise/${id}`);
+      await api["admin"].patch(`/block-expertise/${id}`);
       return { success: true };
     } catch (error: any) {
       throw new Error(
-        error.response?.data?.message || "Failed to delete expertise"
+        error.response?.data?.message || "Failed to block expertise"
+      );
+    }
+  }
+
+  async unBlockExpertise(id: string): Promise<{ success: boolean }> {
+    try {
+      await api["admin"].patch(`/unblock-expertise/${id}`);
+      return { success: true };
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Failed to unblock expertise"
+      );
+    }
+  }
+
+  // Fix the return type to match what the backend actually returns
+  async getExpertise(): Promise<{ success: boolean; data: ExpertiseArea[] }> {
+    try {
+      const response = await api["admin"].get("/get-expertise");
+      if (response.status !== 200) {
+        throw new Error("Failed to fetch expertise");
+      }
+      return { success: true, data: response.data };
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch expertise"
       );
     }
   }

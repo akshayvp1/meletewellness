@@ -526,6 +526,133 @@ addCollegeData = async (req: Request, res: Response): Promise<void> => {
       });
     }
   };
+  getExpertise = async (_req: Request, res: Response): Promise<void> => {
+    try {
+      const expertises = await this.adminAuthService.getExpertise();
+      
+      res.status(200).json({
+        success: true,
+        data: expertises,
+        message: "expertise list retrieved successfully"
+      });
+    } catch (error: any) {
+      console.error("Error in expertise:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Internal server error" 
+      });
+    }
+  };
+  addExpertise = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const expertiseData = req.body;
+
+      if (!expertiseData.name || !expertiseData.description) {
+        res.status(400).json({ 
+          success: false, 
+          message: "Name and description are required" 
+        });
+        return;
+      }
+
+      const addedExpertise = await this.adminAuthService.addExpertise(expertiseData);
+
+      res.status(200).json({
+        success: true,
+        data: addedExpertise,
+        message: "Expertise added successfully",
+      });
+    } catch (error: any) {
+      console.error("Error in addExpertise controller:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Failed to add expertise",
+      });
+    }
+  };
+  updateExpertise = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      const expertiseData = req.body;
+
+      if (!id) {
+        res.status(400).json({ 
+          success: false, 
+          message: "Expertise ID is required" 
+        });
+        return;
+      }
+
+      const updatedExpertise = await this.adminAuthService.updateExpertise(id, expertiseData);
+
+      res.status(200).json({
+        success: true,
+        data: updatedExpertise,
+        message: "Expertise updated successfully",
+      });
+    } catch (error: any) {
+      console.error("Error in updateExpertise controller:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Failed to update expertise",
+      });
+    }
+  };
+  blockExpertise = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({ 
+          success: false, 
+          message: "Expertise ID is required" 
+        });
+        return;
+      }
+
+      const blockedExpertise = await this.adminAuthService.blockExpertise(id);
+
+      res.status(200).json({
+        success: true,
+        data: blockedExpertise,
+        message: "Expertise blocked successfully",
+      });
+    } catch (error: any) {
+      console.error("Error in blockExpertise controller:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Failed to block expertise",
+      });
+    }
+  };
+
+  unBlockExpertise = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+
+      if (!id) {
+        res.status(400).json({ 
+          success: false, 
+          message: "Expertise ID is required" 
+        });
+        return;
+      }
+
+      const unblockedExpertise = await this.adminAuthService.unBlockExpertise(id);
+
+      res.status(200).json({
+        success: true,
+        data: unblockedExpertise,
+        message: "Expertise unblocked successfully",
+      });
+    }catch (error: any) {
+      console.error("Error in unBlockExpertise controller:", error);  
+      res.status(500).json({
+        success: false,
+        message: error.message || "Failed to unblock expertise",
+      });
+    }
+  };
 
 
   Check = async (req: Request, res: Response): Promise<void> => {

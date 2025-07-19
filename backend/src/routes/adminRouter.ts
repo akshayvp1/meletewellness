@@ -50,5 +50,11 @@ admin.get('/college-list',adminAuthController.getCollegesList)
 admin.post('/create-user',adminAuthController.createUser)
 admin.patch("/update-user/:userId", adminAuthController.updateAdminUser);
 admin.get('/users-list',adminAuthController.getUsersList)
+admin.get('/get-expertise',adminAuthController.getExpertise)
+admin.post('/add-expertise',adminAuthController.addExpertise)
+admin.put('/update-expertise/:id',adminAuthController.updateExpertise)
+admin.patch('/block-expertise/:id',adminAuthController.blockExpertise)  
+admin.patch('/unblock-expertise/:id',adminAuthController.unBlockExpertise)
+
 
 export default admin;
