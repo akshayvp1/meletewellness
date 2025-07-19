@@ -29,7 +29,7 @@ const ExpertCounsellorsPage: React.FC = () => {
         />
       </Head>
 
-      <div className="min-h-screen bg-gray-50 pt-7">
+      <div className="min-h-screen bg-gray-50 pt-10">
         <HeroSection totalCount={totalCount} />
         <CounsellorContent 
           consultants={consultants}
