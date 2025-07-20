@@ -9,7 +9,7 @@ const nextConfig = {
     unoptimized: true
   },
   eslint: {
-    ignoreDuringBuilds: true // ✅ DISABLE eslint blocking build
+    ignoreDuringBuilds: true 
   },
   // async rewrites() {
   //   return [
