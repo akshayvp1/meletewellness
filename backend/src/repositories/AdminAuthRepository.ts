@@ -388,9 +388,10 @@ async getCollegesList(): Promise<ICollege[]> {
     }
   }
 
-   async getExpertise(): Promise<IAdminUser[]> {
+   async getExpertise(): Promise<IExpertise[]> {
     try {
-      return await this.adminUserModel.find({}).sort({ createdAt: -1 }).lean();
+       
+      return await this.expertiseModel.find({}).sort({ createdAt: -1 }).lean();
     } catch (error) {
       console.error("Error fetching expertiselist:", error);
       throw new Error("Failed to fetch expertiselist");

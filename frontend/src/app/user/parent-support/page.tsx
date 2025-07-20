@@ -7,7 +7,7 @@ import { ServicesSection } from '@/components/user/parent-support/ServicesSectio
 import { ApproachSection } from '@/components/user/parent-support/ApproachSection';
 import Counsellors from '@/components/user/experts/ExpertCounsellors';
 import ParentImage from '@/../public/assets/parent.webp';
-
+import SEO from '@/components/SEO';
 const ParentSupportPage: React.FC = () => {
   return (
     <>
@@ -22,6 +22,7 @@ const ParentSupportPage: React.FC = () => {
           content="parent mental health, parenting support, family therapy, stress relief for parents, parenting counselling"
         />
       </Head>
+      <SEO />
 
       <div className="min-h-screen bg-white pt-7">
         <HeroSection parentImage={ParentImage.src} />

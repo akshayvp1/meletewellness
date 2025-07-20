@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, UserPlus, HelpCircle, LogOut, ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { LayoutDashboard, Users, UserPlus, UserCog, GraduationCap, Building2, LogOut, ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import companyLogo from '@/../public/assets/logoWhite.png';
 import AdminAuthService from '@/services/admin/AdminAuthService';
@@ -99,24 +99,23 @@ const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ children })
       mobileVisible: true 
     },
     { 
-      icon: UserPlus, 
+      icon: UserCog, 
       label: 'Add User', 
       path: '/admin/add-user', 
       mobileVisible: true 
     },
+     { 
+      icon: GraduationCap, 
+      label: 'Add Expertise', 
+      path: '/admin/add-expertise', 
+      mobileVisible: true 
+    },
     { 
-      icon: Users, 
+      icon: Building2, 
       label: 'College Management', 
       path: '/admin/add-colleges', 
       mobileVisible: true 
-    },
-    
-    { 
-      icon: HelpCircle, 
-      label: 'Help', 
-      path: '', 
-      mobileVisible: true 
-    },
+    }
   ];
 
   const mobileNavItems = navigationItems.filter(item => item.mobileVisible);
@@ -296,7 +295,7 @@ const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ children })
                 alt="Company Logo"
                 className="h-8 mr-2"
               />
-              <h1 className="text-xl font-bold text-white">Admin Portal</h1>
+             
             </div>
             <div className="rounded-full overflow-hidden border-2 border-white/20 shadow-sm h-8 w-8">
               {user?.profileImage ? (
@@ -314,7 +313,7 @@ const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ children })
       {/* Mobile Bottom Navigation */}
       {isMobile && (
         <div className="fixed bottom-0 left-0 right-0 bg-[#0A4F43] border-t border-white/10 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] h-16 z-50">
-          <div className="grid grid-cols-4 h-full">
+          <div className="grid grid-cols-6 h-full">
             {mobileNavItems.map((item) => {
               const isActive = pathname === item.path;
               return (

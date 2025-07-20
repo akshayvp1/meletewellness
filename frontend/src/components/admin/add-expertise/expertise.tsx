@@ -1,12 +1,13 @@
-
 "use client"
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Search, Save, X } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Plus, Edit2, Trash2, Search, Save, X, Lock, Unlock } from 'lucide-react';
 import ExpertiseManagingService from '@/services/admin/ExpertiseManagingService';
 import toast from 'react-hot-toast';
 
 interface ExpertiseArea {
-  id: string;
+  _id?: string;  // MongoDB ObjectId
+  id?: string;   // Regular ID
+  expertiseId?: string;  // Alternative ID field
   name: string;
   description: string;
   isActive: boolean;
@@ -21,6 +22,11 @@ const ExpertiseAdmin = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
   const [isLoading, setIsLoading] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<{
+    type: 'block' | 'unblock';
+    expertise: ExpertiseArea;
+  } | null>(null);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -28,38 +34,68 @@ const ExpertiseAdmin = () => {
     isActive: true
   });
 
+  // Refs for maintaining focus
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const descriptionInputRef = useRef<HTMLTextAreaElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Helper function to get the ID from expertise object
+  const getExpertiseId = useCallback((expertise: ExpertiseArea): string | null => {
+    return expertise._id || expertise.id || expertise.expertiseId || null;
+  }, []);
+
   // Load expertise areas on component mount
   useEffect(() => {
     fetchExpertiseAreas();
   }, []);
 
-  const fetchExpertiseAreas = async () => {
+  const fetchExpertiseAreas = useCallback(async () => {
     setIsLoading(true);
     try {
       const response = await ExpertiseManagingService.getExpertise();
+      
       if (response.success) {
-        // Ensure we always set an array
         const data = Array.isArray(response.data) ? response.data : [];
         setExpertiseAreas(data as ExpertiseArea[]);
       } else {
-        console.error('API response not successful:', response);
         setExpertiseAreas([]);
         toast.error('Failed to load expertise areas');
       }
     } catch (error) {
-      console.error('Error fetching expertise areas:', error);
-      setExpertiseAreas([]); // Reset to empty array on error
+      setExpertiseAreas([]);
       toast.error('Failed to load expertise areas');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const resetForm = () => {
+  // Stable form handlers using useCallback
+  const handleFormChange = useCallback((field: keyof typeof formData) => {
+    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+      const value = field === 'isActive' 
+        ? e.target.value === 'active' 
+        : e.target.value;
+      
+      setFormData(prev => ({ 
+        ...prev, 
+        [field]: value 
+      }));
+    };
+  }, []);
+
+  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  }, []);
+
+  const handleStatusFilterChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
+    setStatusFilter(e.target.value as 'all' | 'active' | 'inactive');
+  }, []);
+
+  const resetForm = useCallback(() => {
     setFormData({ name: '', description: '', isActive: true });
-  };
+  }, []);
 
-  const handleCreate = async () => {
+  const handleCreate = useCallback(async () => {
     if (!formData.name.trim()) {
       toast.error('Please enter expertise name');
       return;
@@ -77,28 +113,46 @@ const ExpertiseAdmin = () => {
         toast.success('Expertise area created successfully!');
         setShowCreateModal(false);
         resetForm();
-        // Refresh the list after creating
         await fetchExpertiseAreas();
+      } else {
+        toast.error('Failed to create expertise area');
       }
-    } catch (error) {
-      console.error('Error creating expertise:', error);
-      toast.error('Failed to create expertise area');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to create expertise area';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [formData, resetForm, fetchExpertiseAreas]);
 
-  const handleEdit = (expertise: ExpertiseArea) => {
+  const handleEdit = useCallback((expertise: ExpertiseArea) => {
+    const expertiseId = getExpertiseId(expertise);
+    
+    if (!expertiseId) {
+      toast.error('Invalid expertise data - no ID found');
+      return;
+    }
+    
     setEditingExpertise(expertise);
     setFormData({
       name: expertise.name,
       description: expertise.description,
       isActive: expertise.isActive
     });
-  };
+  }, [getExpertiseId]);
 
-  const handleUpdate = async () => {
-    if (!editingExpertise) return;
+  const handleUpdate = useCallback(async () => {
+    if (!editingExpertise) {
+      toast.error('No expertise selected for editing');
+      return;
+    }
+    
+    const expertiseId = getExpertiseId(editingExpertise);
+    
+    if (!expertiseId) {
+      toast.error('Invalid expertise ID - cannot update');
+      return;
+    }
     
     if (!formData.name.trim()) {
       toast.error('Please enter expertise name');
@@ -107,7 +161,7 @@ const ExpertiseAdmin = () => {
     
     setIsLoading(true);
     try {
-      const response = await ExpertiseManagingService.updateExpertise(editingExpertise.id, {
+      const response = await ExpertiseManagingService.updateExpertise(expertiseId, {
         name: formData.name.trim(),
         description: formData.description.trim(),
         isActive: formData.isActive
@@ -117,98 +171,179 @@ const ExpertiseAdmin = () => {
         toast.success('Expertise area updated successfully!');
         setEditingExpertise(null);
         resetForm();
-        // Refresh the list after updating
         await fetchExpertiseAreas();
+      } else {
+        const errorMessage = response.message || 'Failed to update expertise area';
+        toast.error(errorMessage);
       }
-    } catch (error) {
-      console.error('Error updating expertise:', error);
-      toast.error('Failed to update expertise area');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleBlock = async (id: string) => {
-    if (!window.confirm('Are you sure you want to block this expertise area?')) {
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      const result = await ExpertiseManagingService.blockExpertise(id);
       
-      if (result.success) {
-        toast.success('Expertise area blocked successfully!');
-        // Refresh the list after blocking
-        await fetchExpertiseAreas();
-      }
-    } catch (error) {
-      console.error('Error blocking expertise:', error);
-      toast.error('Failed to block expertise area');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to update expertise area';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [editingExpertise, formData, getExpertiseId, resetForm, fetchExpertiseAreas]);
 
-  const handleUnblock = async (id: string) => {
-    if (!window.confirm('Are you sure you want to unblock this expertise area?')) {
-      return;
-    }
+  const showBlockConfirmation = useCallback((expertise: ExpertiseArea) => {
+    setConfirmAction({ type: 'block', expertise });
+    setShowConfirmDialog(true);
+  }, []);
 
-    setIsLoading(true);
-    try {
-      const result = await ExpertiseManagingService.unBlockExpertise(id);
-      
-      if (result.success) {
-        toast.success('Expertise area unblocked successfully!');
-        // Refresh the list after unblocking
-        await fetchExpertiseAreas();
-      }
-    } catch (error) {
-      console.error('Error unblocking expertise:', error);
-      toast.error('Failed to unblock expertise area');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const showUnblockConfirmation = useCallback((expertise: ExpertiseArea) => {
+    setConfirmAction({ type: 'unblock', expertise });
+    setShowConfirmDialog(true);
+  }, []);
 
-  // Ensure expertiseAreas is always an array before filtering
-  const filteredExpertise = Array.isArray(expertiseAreas) ? expertiseAreas.filter(expertise => {
-    const matchesSearch = expertise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         expertise.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || 
-                         (statusFilter === 'active' && expertise.isActive) ||
-                         (statusFilter === 'inactive' && !expertise.isActive);
-    return matchesSearch && matchesStatus;
-  }) : [];
+  const handleConfirmAction = useCallback(async () => {
+    if (!confirmAction) return;
 
-  const Modal = ({ isOpen, onClose, title, children }: { 
-    isOpen: boolean; 
-    onClose: () => void; 
-    title: string; 
-    children: React.ReactNode 
-  }) => {
-    if (!isOpen) return null;
+    const { type, expertise } = confirmAction;
+    const expertiseId = getExpertiseId(expertise);
     
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <X size={24} />
-            </button>
-          </div>
-          <div className="p-6">
-            {children}
+    if (!expertiseId) {
+      toast.error('Invalid expertise ID');
+      setShowConfirmDialog(false);
+      setConfirmAction(null);
+      return;
+    }
+
+    setIsLoading(true);
+    setShowConfirmDialog(false);
+    
+    try {
+      let result;
+      if (type === 'block') {
+        result = await ExpertiseManagingService.blockExpertise(expertiseId);
+        if (result.success) {
+          toast.success('Expertise area blocked successfully!');
+        } else {
+          toast.error('Failed to block expertise area');
+        }
+      } else {
+        result = await ExpertiseManagingService.unBlockExpertise(expertiseId);
+        if (result.success) {
+          toast.success('Expertise area unblocked successfully!');
+        } else {
+          toast.error('Failed to unblock expertise area');
+        }
+      }
+      
+      if (result.success) {
+        await fetchExpertiseAreas();
+      }
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.message || `Failed to ${type} expertise area`;
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+      setConfirmAction(null);
+    }
+  }, [confirmAction, getExpertiseId, fetchExpertiseAreas]);
+
+  const handleCancelConfirmation = useCallback(() => {
+    setShowConfirmDialog(false);
+    setConfirmAction(null);
+  }, []);
+
+  const closeCreateModal = useCallback(() => {
+    setShowCreateModal(false);
+    resetForm();
+  }, [resetForm]);
+
+  const closeEditModal = useCallback(() => {
+    setEditingExpertise(null);
+    resetForm();
+  }, [resetForm]);
+
+  // Memoized filtered results to prevent unnecessary re-calculations
+  const filteredExpertise = useMemo(() => {
+    if (!Array.isArray(expertiseAreas)) return [];
+    
+    return expertiseAreas.filter(expertise => {
+      const matchesSearch = expertise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           expertise.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesStatus = statusFilter === 'all' || 
+                           (statusFilter === 'active' && expertise.isActive) ||
+                           (statusFilter === 'inactive' && !expertise.isActive);
+      return matchesSearch && matchesStatus;
+    });
+  }, [expertiseAreas, searchTerm, statusFilter]);
+
+  // Memoized Modal component to prevent re-creation
+  const Modal = useMemo(() => {
+    return ({ isOpen, onClose, title, children }: { 
+      isOpen: boolean; 
+      onClose: () => void; 
+      title: string; 
+      children: React.ReactNode 
+    }) => {
+      if (!isOpen) return null;
+      
+      return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800">{title}</h2>
+              <button
+                onClick={onClose}
+                type="button"
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="p-6">
+              {children}
+            </div>
           </div>
         </div>
-      </div>
-    );
-  };
+      );
+    };
+  }, []);
+
+  const ConfirmDialog = useMemo(() => {
+    return () => {
+      if (!showConfirmDialog || !confirmAction) return null;
+
+      const { type, expertise } = confirmAction;
+      const actionText = type === 'block' ? 'block' : 'unblock';
+      const actionColor = type === 'block' ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600';
+
+      return (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+            <div className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Confirm {actionText.charAt(0).toUpperCase() + actionText.slice(1)}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to {actionText} the expertise area "{expertise.name}"?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleCancelConfirmation}
+                  disabled={isLoading}
+                  type="button"
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmAction}
+                  disabled={isLoading}
+                  type="button"
+                  className={`flex-1 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 ${actionColor}`}
+                >
+                  {isLoading ? `${actionText.charAt(0).toUpperCase() + actionText.slice(1)}ing...` : actionText.charAt(0).toUpperCase() + actionText.slice(1)}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    };
+  }, [showConfirmDialog, confirmAction, isLoading, handleCancelConfirmation, handleConfirmAction]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -222,6 +357,7 @@ const ExpertiseAdmin = () => {
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
+              type="button"
               className="bg-[#015F4A] hover:bg-[#014A3B] text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-md"
             >
               <Plus size={20} />
@@ -236,20 +372,21 @@ const ExpertiseAdmin = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="Search expertise areas..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent"
+                onChange={handleSearchChange}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent outline-none"
               />
             </div>
             <div className="flex items-center gap-2">
               <select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as 'all' | 'active' | 'inactive')}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent"
+                onChange={handleStatusFilterChange}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent outline-none"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -266,70 +403,112 @@ const ExpertiseAdmin = () => {
           </div>
         )}
 
-        {/* Expertise Areas Grid */}
+        {/* Expertise Areas List */}
         {!isLoading && (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredExpertise.map((expertise) => (
-              <div key={expertise.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200">
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{expertise.name}</h3>
-                      <p className="text-gray-600 text-sm mb-3">{expertise.description}</p>
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          expertise.isActive 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {expertise.isActive ? 'Active' : 'Inactive'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 mb-4">
-                    <p>Created: {new Date(expertise.createdAt).toLocaleDateString()}</p>
-                    <p>Updated: {new Date(expertise.updatedAt).toLocaleDateString()}</p>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEdit(expertise)}
-                      disabled={isLoading}
-                      className="flex-1 bg-[#015F4A] hover:bg-[#014A3B] text-white px-3 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
-                    >
-                      <Edit2 size={16} />
-                      Edit
-                    </button>
-                    {expertise.isActive ? (
-                      <button
-                        onClick={() => handleBlock(expertise.id)}
-                        disabled={isLoading}
-                        className="px-3 py-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
-                        title="Block"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleUnblock(expertise.id)}
-                        disabled={isLoading}
-                        className="px-3 py-2 border border-green-300 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50"
-                        title="Unblock"
-                      >
-                        <Plus size={16} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Name
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Created Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Updated Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredExpertise.map((expertise, index) => {
+                    const expertiseId = getExpertiseId(expertise);
+                    return (
+                      <tr key={expertiseId || `expertise-${index}`} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{expertise.name}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="text-sm text-gray-600 max-w-xs truncate" title={expertise.description}>
+                            {expertise.description || '-'}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {new Date(expertise.createdAt).toLocaleDateString()}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-500">
+                            {new Date(expertise.updatedAt).toLocaleDateString()}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                            expertise.isActive 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {expertise.isActive ? 'Active' : 'Inactive'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => handleEdit(expertise)}
+                              disabled={isLoading || !expertiseId}
+                              type="button"
+                              className="bg-[#015F4A] hover:bg-[#014A3B] text-white px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors disabled:opacity-50"
+                            >
+                              <Edit2 size={14} />
+                              Edit
+                            </button>
+                            {expertise.isActive ? (
+                              <button
+                                onClick={() => showBlockConfirmation(expertise)}
+                                disabled={isLoading || !expertiseId}
+                                type="button"
+                                className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors disabled:opacity-50"
+                                title="Block Expertise"
+                              >
+                                <Lock size={14} />
+                                Block
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => showUnblockConfirmation(expertise)}
+                                disabled={isLoading || !expertiseId}
+                                type="button"
+                                className="bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded text-xs flex items-center gap-1 transition-colors disabled:opacity-50"
+                                title="Unblock Expertise"
+                              >
+                                <Unlock size={14} />
+                                Unblock
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
         {!isLoading && filteredExpertise.length === 0 && (
-          <div className="text-center py-12">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
             <div className="text-gray-400 mb-4">
               <Search size={48} className="mx-auto" />
             </div>
@@ -341,10 +520,7 @@ const ExpertiseAdmin = () => {
       {/* Create Modal */}
       <Modal 
         isOpen={showCreateModal} 
-        onClose={() => {
-          setShowCreateModal(false);
-          resetForm();
-        }}
+        onClose={closeCreateModal}
         title="Add New Expertise Area"
       >
         <div className="space-y-4">
@@ -353,12 +529,15 @@ const ExpertiseAdmin = () => {
               Expertise Name *
             </label>
             <input
+              ref={nameInputRef}
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent"
+              onChange={handleFormChange('name')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent outline-none"
               placeholder="Enter expertise name"
               required
+              autoComplete="off"
+              spellCheck="false"
             />
           </div>
           
@@ -367,11 +546,14 @@ const ExpertiseAdmin = () => {
               Description
             </label>
             <textarea
+              ref={descriptionInputRef}
               value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              onChange={handleFormChange('description')}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent resize-none outline-none"
               placeholder="Describe the expertise area..."
+              autoComplete="off"
+              spellCheck="false"
             />
           </div>
           
@@ -381,8 +563,8 @@ const ExpertiseAdmin = () => {
             </label>
             <select
               value={formData.isActive ? 'active' : 'inactive'}
-              onChange={(e) => setFormData({...formData, isActive: e.target.value === 'active'})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent"
+              onChange={handleFormChange('isActive')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent outline-none"
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
@@ -391,11 +573,9 @@ const ExpertiseAdmin = () => {
           
           <div className="flex gap-3 pt-4">
             <button
-              onClick={() => {
-                setShowCreateModal(false);
-                resetForm();
-              }}
+              onClick={closeCreateModal}
               disabled={isLoading}
+              type="button"
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
               Cancel
@@ -403,6 +583,7 @@ const ExpertiseAdmin = () => {
             <button
               onClick={handleCreate}
               disabled={isLoading}
+              type="button"
               className="flex-1 bg-[#015F4A] hover:bg-[#014A3B] text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
             >
               <Save size={16} />
@@ -415,10 +596,7 @@ const ExpertiseAdmin = () => {
       {/* Edit Modal */}
       <Modal 
         isOpen={!!editingExpertise} 
-        onClose={() => {
-          setEditingExpertise(null);
-          resetForm();
-        }}
+        onClose={closeEditModal}
         title="Edit Expertise Area"
       >
         <div className="space-y-4">
@@ -429,10 +607,11 @@ const ExpertiseAdmin = () => {
             <input
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent"
+              onChange={handleFormChange('name')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent outline-none"
               placeholder="Enter expertise name"
               required
+              autoComplete="off"
             />
           </div>
           
@@ -442,10 +621,11 @@ const ExpertiseAdmin = () => {
             </label>
             <textarea
               value={formData.description}
-              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              onChange={handleFormChange('description')}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent outline-none resize-none"
               placeholder="Describe the expertise area..."
+              autoComplete="off"
             />
           </div>
           
@@ -455,8 +635,8 @@ const ExpertiseAdmin = () => {
             </label>
             <select
               value={formData.isActive ? 'active' : 'inactive'}
-              onChange={(e) => setFormData({...formData, isActive: e.target.value === 'active'})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent"
+              onChange={handleFormChange('isActive')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#015F4A] focus:border-transparent outline-none"
             >
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
@@ -465,11 +645,9 @@ const ExpertiseAdmin = () => {
           
           <div className="flex gap-3 pt-4">
             <button
-              onClick={() => {
-                setEditingExpertise(null);
-                resetForm();
-              }}
+              onClick={closeEditModal}
               disabled={isLoading}
+              type="button"
               className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
               Cancel
@@ -477,14 +655,18 @@ const ExpertiseAdmin = () => {
             <button
               onClick={handleUpdate}
               disabled={isLoading}
+              type="button"
               className="flex-1 bg-[#015F4A] hover:bg-[#014A3B] text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
             >
               <Save size={16} />
               {isLoading ? 'Updating...' : 'Update Expertise'}
             </button>
-            </div>
+          </div>
         </div>
       </Modal>
+
+      {/* Custom Confirmation Dialog */}
+      <ConfirmDialog />
     </div>
   );
 };

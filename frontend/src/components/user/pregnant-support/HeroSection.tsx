@@ -40,7 +40,7 @@ export const HeroSection: React.FC = () => {
           }`}>
             <div className="relative">
               <img
-                src="/assets/pregnant.webp"
+                src="/pregnant.webp"
                 alt="Pregnant woman receiving mental health support"
                 className="w-full h-96 lg:h-[500px] object-cover rounded-3xl shadow-2xl"
                 onError={(e) => {

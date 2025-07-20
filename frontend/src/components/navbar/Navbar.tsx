@@ -435,7 +435,7 @@ const Navbar: React.FC = () => {
             ))}
 
             {/* Desktop Login/User Button */}
-            {/* <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3">
               {
               auth.name ? (
                 <div className="flex items-center space-x-2 px-4 py-2 text-gray-800 font-semibold text-base rounded-lg bg-gray-50">
@@ -454,7 +454,7 @@ const Navbar: React.FC = () => {
                 </Link>
               )
               }
-            </div> */}
+            </div>
           </div>
         </div>
       </nav>

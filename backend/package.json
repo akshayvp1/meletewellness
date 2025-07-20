@@ -24,6 +24,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.14.3",
     "morgan": "^1.10.0",
+    "next-sitemap": "^4.2.3",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.10.0"
   },

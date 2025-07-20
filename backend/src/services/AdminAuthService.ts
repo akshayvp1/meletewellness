@@ -377,8 +377,9 @@ async addCollegeData(collegeData: AddCollegeData): Promise<ICollege> {
     }
   }
   
-  async getExpertise(): Promise<IAdminUser[]> {
+  async getExpertise(): Promise<IExpertise[]> {
     try {
+       
       const expertises = await this.adminAuthRepository.getExpertise();
       return expertises || [];
     } catch (error: any) {

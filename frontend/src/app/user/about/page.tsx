@@ -6,7 +6,7 @@ import WhyChooseSection from '@/components/user/about/WhyChooseSection';
 import SpecialtiesSection from '@/components/user/about/SpecialtiesSection';
 import HelpSection from '@/components/user/about/HelpSection';
 import AppDownloadSection from '@/components/user/about/AppDownloadSection';
-
+import SEO from '@/components/SEO';
 const AboutPage: React.FC = () => {
   return (
     <>
@@ -21,6 +21,7 @@ const AboutPage: React.FC = () => {
           content="about Melete, mental health support, mental health mission, mental health services, 24/7 mental wellness"
         />
       </Head>
+      <SEO />
 
       <main className="min-h-screen bg-white pt-7">
         <HeroSection />

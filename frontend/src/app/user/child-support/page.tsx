@@ -6,7 +6,7 @@ import HeroSection from '@/components/user/child-support/HeroSection';
 import ServicesSection from '@/components/user/child-support/ServicesSection';
 import ApproachSection from '@/components/user/child-support/ApproachSection';
 import Counellors from '@/components/user/experts/ExpertCounsellors';
-
+import SEO from '@/components/SEO';
 const ChildSupportPage: React.FC = () => {
   return (
     <>
@@ -21,7 +21,7 @@ const ChildSupportPage: React.FC = () => {
           content="child mental health, child counselling, therapy for kids, mental wellness for children, emotional support for kids"
         />
       </Head>
-
+      <SEO />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 pt-7">
         <HeroSection />
         <ServicesSection />

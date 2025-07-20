@@ -3,10 +3,11 @@
 import React from 'react';
 import Head from 'next/head';
 import TherapyImprovementsSection from '@/components/user/improve-with-us/TherapyImprovementSecond';
-
+import SEO from '@/components/SEO';
 const ExpertCounsellorsPage: React.FC = () => {
   return (
     <>
+      
       <Head>
         <title>Improve Your Mental Well-being | Melete</title>
         <meta
@@ -18,6 +19,7 @@ const ExpertCounsellorsPage: React.FC = () => {
           content="mental well-being, self improvement therapy, mental health improvement, mindfulness programs, mental resilience"
         />
       </Head>
+      <SEO />
 
       <div className='pt-7'>
         <TherapyImprovementsSection />

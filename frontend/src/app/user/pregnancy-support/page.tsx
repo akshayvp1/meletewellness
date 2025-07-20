@@ -5,7 +5,7 @@ import { HeroSection } from '@/components/user/pregnant-support/HeroSection';
 import { ServicesSection } from '@/components/user/pregnant-support/ServicesSection';
 import { ApproachSection } from '@/components/user/pregnant-support/ApproachSection';
 import Counsellors from '@/components/user/experts/ExpertCounsellors';
-
+import SEO from '@/components/SEO';
 export default function PregnancySupportPage() {
   return (
     <>
@@ -20,6 +20,7 @@ export default function PregnancySupportPage() {
           content="pregnancy mental health, postpartum support, maternity counselling, pregnancy stress, emotional support for mothers"
         />
       </Head>
+      <SEO />
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 pt-7">
         <HeroSection />

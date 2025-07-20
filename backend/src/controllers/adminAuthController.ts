@@ -526,8 +526,11 @@ addCollegeData = async (req: Request, res: Response): Promise<void> => {
       });
     }
   };
+
   getExpertise = async (_req: Request, res: Response): Promise<void> => {
     try {
+     
+      
       const expertises = await this.adminAuthService.getExpertise();
       
       res.status(200).json({
@@ -572,7 +575,10 @@ addCollegeData = async (req: Request, res: Response): Promise<void> => {
   };
   updateExpertise = async (req: Request, res: Response): Promise<void> => {
     try {
+
       const { id } = req.params;
+      console.log(id, "id in update expertise");
+      
       const expertiseData = req.body;
 
       if (!id) {

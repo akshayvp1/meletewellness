@@ -17,7 +17,25 @@ interface ExpertiseArea {
   updatedAt: string;
 }
 
+
+
 class ExpertiseManagingService {
+
+  async getExpertise(): Promise<{ success: boolean; data: ExpertiseArea[] }> {
+    try {
+      const response = await api["admin"].get("/get-expertise");
+      console.log(response.data,"ooooooooooooi");
+      
+      if (response.status !== 200) {
+        throw new Error("Failed to fetch expertise");
+      }
+      return response.data
+    } catch (error: any) {
+      throw new Error(
+        error.response?.data?.message || "Failed to fetch expertise"
+      );
+    }
+  }
   
   async addExpertise(
     expertiseData: ExpertiseData
@@ -35,19 +53,37 @@ class ExpertiseManagingService {
     }
   }
 
-  async updateExpertise(
-    id: string,
-    expertiseData: ExpertiseData
-  ): Promise<{ success: boolean }> {
-    try {
-      await api["admin"].put(`/update-expertise/${id}`, expertiseData);
-      return { success: true };
-    } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || "Failed to update expertise"
-      );
+ async updateExpertise(
+  id: string,
+  expertiseData: ExpertiseData
+): Promise<{ success: boolean; data?: ExpertiseArea; message?: string }> {
+  try {
+    
+    if (!id || id === 'undefined' || id === 'null') {
+      console.error("Invalid ID provided:", id);
+      return {
+        success: false,
+        message: "Invalid expertise ID provided"
+      };
     }
+    
+    const cleanId = String(id).trim();
+    
+    const response = await api["admin"].patch(`/update-expertise/${cleanId}`, expertiseData);
+
+    return { 
+      success: true, 
+      data: response.data,
+      message: "Expertise updated successfully"
+    };
+  } catch (error: any) {
+    console.error('UpdateExpertise API Error:', error);
+    return {
+      success: false,
+      message: error.response?.data?.message || "Failed to update expertise"
+    };
   }
+}
 
   async blockExpertise(id: string): Promise<{ success: boolean }> {
     try {
@@ -72,19 +108,7 @@ class ExpertiseManagingService {
   }
 
   // Fix the return type to match what the backend actually returns
-  async getExpertise(): Promise<{ success: boolean; data: ExpertiseArea[] }> {
-    try {
-      const response = await api["admin"].get("/get-expertise");
-      if (response.status !== 200) {
-        throw new Error("Failed to fetch expertise");
-      }
-      return { success: true, data: response.data };
-    } catch (error: any) {
-      throw new Error(
-        error.response?.data?.message || "Failed to fetch expertise"
-      );
-    }
-  }
+  
 }
 
 export default new ExpertiseManagingService();

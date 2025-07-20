@@ -5,7 +5,7 @@ import Head from 'next/head';
 import { useCounsellors } from '@/components/hooks/useCounsellors';
 import HeroSection from '@/components/user/experts/HeroSection';
 import CounsellorContent from '@/components/user/experts/CounsellorContent';
-
+import SEO from '@/components/SEO';
 const ExpertCounsellorsPage: React.FC = () => {
   const { consultants, loading, error, totalCount } = useCounsellors();
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -28,7 +28,7 @@ const ExpertCounsellorsPage: React.FC = () => {
           content="mental health experts, therapists, counsellors, professional therapy, mental health specialists"
         />
       </Head>
-
+      <SEO />
       <div className="min-h-screen bg-gray-50 pt-10">
         <HeroSection totalCount={totalCount} />
         <CounsellorContent 
