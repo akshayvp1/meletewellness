@@ -16,7 +16,7 @@
 // export default AdminLogin;
 
 
-
+// src/app/admin-login/page.tsx
 'use client';
 
 import { useEffect } from 'react';
@@ -31,7 +31,7 @@ export default function AdminLoginPage() {
 
   useEffect(() => {
     if (isAuthenticated && role === 'admin') {
-      router.replace('/admin/dashboard'); // Redirect if already logged in
+      router.replace('/admin/dashboard');
     }
   }, [isAuthenticated, role, router]);
 

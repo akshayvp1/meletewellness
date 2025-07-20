@@ -1,3 +1,4 @@
+
 "use client"
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Search, Save, X } from 'lucide-react';
@@ -37,11 +38,17 @@ const ExpertiseAdmin = () => {
     try {
       const response = await ExpertiseManagingService.getExpertise();
       if (response.success) {
-       
-        setExpertiseAreas(response.data as ExpertiseArea[]);
+        // Ensure we always set an array
+        const data = Array.isArray(response.data) ? response.data : [];
+        setExpertiseAreas(data as ExpertiseArea[]);
+      } else {
+        console.error('API response not successful:', response);
+        setExpertiseAreas([]);
+        toast.error('Failed to load expertise areas');
       }
     } catch (error) {
       console.error('Error fetching expertise areas:', error);
+      setExpertiseAreas([]); // Reset to empty array on error
       toast.error('Failed to load expertise areas');
     } finally {
       setIsLoading(false);
@@ -165,14 +172,15 @@ const ExpertiseAdmin = () => {
     }
   };
 
-  const filteredExpertise = expertiseAreas.filter(expertise => {
+  // Ensure expertiseAreas is always an array before filtering
+  const filteredExpertise = Array.isArray(expertiseAreas) ? expertiseAreas.filter(expertise => {
     const matchesSearch = expertise.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          expertise.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || 
                          (statusFilter === 'active' && expertise.isActive) ||
                          (statusFilter === 'inactive' && !expertise.isActive);
     return matchesSearch && matchesStatus;
-  });
+  }) : [];
 
   const Modal = ({ isOpen, onClose, title, children }: { 
     isOpen: boolean; 

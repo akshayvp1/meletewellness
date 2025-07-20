@@ -13,30 +13,35 @@
 //   );
 // }
 
+// src/components/layouts/AdminLayout.tsx
 
 
 'use client';
 
+import { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import AdminDashboardLayout from '@/components/layouts/adminLayout';
 import { RootState } from '@/store/app/store';
+import AdminDashboardLayout from '@/components/layouts/adminLayout';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, role } = useSelector((state: RootState) => state.auth);
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
+    // Only redirect if clearly not authenticated after refresh attempts
     if (!isAuthenticated || role !== 'admin') {
       router.replace('/admin-login');
     }
-  }, [isAuthenticated, role, pathname, router]);
+    setLoading(false);
+  }, [isAuthenticated, role]);
 
-  if (!isAuthenticated || role !== 'admin') return null;
+  if (loading || !isAuthenticated || role !== 'admin') {
+    return <div className="w-full h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return <AdminDashboardLayout>{children}</AdminDashboardLayout>;
 }
-
-

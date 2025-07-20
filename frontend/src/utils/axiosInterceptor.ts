@@ -5,7 +5,7 @@ import axios, {
   AxiosError,
 } from "axios";
 import { store } from "@/store/app/store";
-import { setToken } from "@/store/features/authSlice";
+import { setToken, signOut } from "@/store/features/authSlice"; // ✅ correct named import
 
 const API_URLS = {
   user: process.env.NEXT_PUBLIC_API_USER || "",
@@ -53,15 +53,10 @@ const refreshAuthToken = async (role: UserRole): Promise<string | null> => {
         throw new Error("No access token received");
       }
     } catch (error: any) {
-      console.error(
-        "Refresh token error:",
-        error.response?.data || error.message
-      );
+      console.error("Refresh token error:", error.response?.data || error.message);
       store.dispatch(setToken({ token: "" }));
-      if (typeof window !== "undefined") {
-        window.location.href = `/${role}/signin`;
-      }
-      throw error;
+      store.dispatch(signOut()); // ✅ clear Redux state
+      return null; // ❌ Don't redirect here
     } finally {
       refreshPromises[role] = null;
     }
@@ -83,7 +78,7 @@ const createAxiosInstance = (role: UserRole): AxiosInstance => {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-      console.log(`Making request to: ${config.baseURL}${config.url}`); // Add this
+      console.log(`Making request to: ${config.baseURL}${config.url}`);
       return config;
     },
     (error) => {
@@ -114,14 +109,14 @@ const createAxiosInstance = (role: UserRole): AxiosInstance => {
           }
         } catch (refreshError) {
           console.error("Failed to refresh token:", refreshError);
-          return Promise.reject(error);
+          return Promise.reject(refreshError);
         }
       }
 
       console.error(
         `Response error for ${originalRequest?.url}:`,
         error.response?.data
-      ); // Debugging
+      );
       return Promise.reject(error);
     }
   );
