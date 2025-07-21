@@ -153,15 +153,9 @@ class AuthService {
 
   async logout(): Promise<void> {
   try {
-    // Hit logout endpoint
+   
     await api["user"].post("/logout");
-    console.log("✅ User logged out from server");
-
-    // Reset auth state in Redux
     store.dispatch(signOut());
-
-    // Optional: Clear storage if used
-    localStorage.removeItem("token");
 
   } catch (error: unknown) {
     console.error("Logout error:", error);
