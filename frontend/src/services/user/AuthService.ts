@@ -151,21 +151,26 @@ class AuthService {
     }
   }
 
-   async logout(): Promise<void> {
-    try {
-      // Call logout API if needed
-      await api["user"].post("/logout");
-      
-      // Clear store data
-    store.dispatch(signOut())
+  async logout(): Promise<void> {
+  try {
+    // Hit logout endpoint
+    await api["user"].post("/logout");
+    console.log("✅ User logged out from server");
 
+    // Reset auth state in Redux
+    store.dispatch(signOut());
 
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Logout failed";
-      throw new Error(errorMessage);
-    }
+    // Optional: Clear storage if used
+    localStorage.removeItem("token");
+
+  } catch (error: unknown) {
+    console.error("Logout error:", error);
+    const errorMessage =
+      error instanceof Error ? error.message : "Logout failed";
+    throw new Error(errorMessage);
   }
+}
+
 
   async checkStatus(): Promise<boolean> {
     try {
