@@ -6,7 +6,7 @@ interface HeroSectionProps {
   parentImage: string;
 }
 
-export const HeroSection: React.FC<HeroSectionProps> = ({ parentImage }) => {
+export const HeroSection: React.FC<HeroSectionProps> = ({parentImage }) => {
   const [headerRef, isHeaderVisible] = useIntersectionObserver(0.1);
 
   return (

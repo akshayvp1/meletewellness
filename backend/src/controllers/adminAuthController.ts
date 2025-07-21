@@ -660,6 +660,22 @@ addCollegeData = async (req: Request, res: Response): Promise<void> => {
     }
   };
 
+  logout = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
+      res.status(200).json({
+        message: "User signed out successfully",
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  };
+
 
   Check = async (req: Request, res: Response): Promise<void> => {
   try {

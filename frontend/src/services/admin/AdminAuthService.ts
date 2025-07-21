@@ -53,7 +53,7 @@ class AdminAuthService {
         }
       }
 
-        async logout():Promise<void>{
+    async logout():Promise<void>{
     try{
     await api['admin'].post('/admin-logout')
     store.dispatch(signOut()); 

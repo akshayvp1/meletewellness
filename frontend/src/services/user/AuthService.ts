@@ -2,9 +2,10 @@
 
 import { api } from "../../utils/axiosInterceptor";
 import { store } from "../../store/app/store";
-import { signIn } from "../../store/features/authSlice";
+import { signIn, signOut } from "../../store/features/authSlice";
 import { UserRole } from "../../types/auth/auth.types";
 import { setTempUser } from "@/store/features/tempSlice";
+import { IUser } from "../../types/auth/auth.types";
 
 interface UserLoginData {
   email: string;
@@ -14,6 +15,13 @@ interface UserLoginData {
   confirmPassword?: string;
 }
 
+interface AuthResponse {
+  email: string;
+  role: UserRole;
+  token: string;
+  user?: any;
+}
+
 interface GoogleLoginResponse {
   email: string;
   role: UserRole;
@@ -21,26 +29,18 @@ interface GoogleLoginResponse {
   user?: any;
 }
 
-// export interface UpdateCollegeData {
-//   collegeName: string;
-//   mobile?: string;
-//   email?: string;
-//   isActive?: boolean;
-//   expiresAt?: Date;
-// }
-
 class AuthService {
-  async userLogin(loginData: UserLoginData): Promise<void> {
+  async userLogin(loginData: UserLoginData): Promise<AuthResponse> {
     try {
       const isSignUp = !!loginData.name;
 
       if (isSignUp) {
+        // Handle user registration
         const response = await api["user"].post("/register", {
           name: loginData.name,
           email: loginData.email,
           password: loginData.password,
           mobile: loginData.mobile,
-          confirmPassword: loginData.confirmPassword,
         });
 
         const { user, accessToken } = response.data;
@@ -49,43 +49,59 @@ class AuthService {
           throw new Error("Invalid registration response");
         }
 
-        // const authData = {
-        //   email: user.email,
-        //   role: (user.role as UserRole) || 'user',
-        //   token: accessToken,
-        //   isAuthenticated: true,
-        // };
+        // Dispatch actions to store
+        store.dispatch(
+          signIn({
+            name: user.name,
+            email: user.email,
+            role: user.role || "user",
+            token: accessToken,
+            isAuthenticated: true,
+          })
+        );
 
-        // store.dispatch(signIn(authData));
-        // return {
-        //   email: authData.email,
-        //   role: authData.role,
-        //   token: accessToken,
-        //   user: user
-        // };
+        store.dispatch(setTempUser({ tempUser: user }));
+
+        // Return the response data
+        return {
+          email: user.email,
+          role: user.role || "user",
+          token: accessToken,
+          user: user,
+        };
       } else {
-        // User login
-        // const response = await api['user'].post('/login', {
-        //   email: loginData.email,
-        //   password: loginData.password
-        // });
-        // const { user, accessToken } = response.data;
-        // if (!user?.email || !accessToken) {
-        //   throw new Error('Invalid login response');
-        // }
-        // const authData = {
-        //   email: user.email,
-        //   role: (user.role as UserRole) || 'user',
-        //   token: accessToken,
-        //   isAuthenticated: true,
-        // };
-        // store.dispatch(signIn(authData));
-        // return {
-        //   email: authData.email,
-        //   role: authData.role,
-        //   token: accessToken,
-        //   user: user
-        // };
+        // Handle user login
+        const response = await api["user"].post("/login", {
+          email: loginData.email,
+          password: loginData.password,
+        });
+
+        const { user, accessToken } = response.data;
+
+        if (!user?.email || !accessToken) {
+          throw new Error("Invalid login response");
+        }
+
+        // Dispatch actions to store
+        store.dispatch(
+          signIn({
+            name: user.name,
+            email: user.email,
+            role: user.role || "user",
+            token: accessToken,
+            isAuthenticated: true,
+          })
+        );
+
+        store.dispatch(setTempUser({ tempUser: user }));
+
+        // Return the response data
+        return {
+          email: user.email,
+          role: user.role || "user",
+          token: accessToken,
+          user: user,
+        };
       }
     } catch (error: unknown) {
       const errorMessage =
@@ -112,6 +128,7 @@ class AuthService {
           role: user.role || "user",
           token: accessToken,
           isAuthenticated: true,
+          image: user.profile || null,
         })
       );
 
@@ -131,6 +148,22 @@ class AuthService {
       } else {
         throw new Error("Google login failed: Unknown error");
       }
+    }
+  }
+
+   async logout(): Promise<void> {
+    try {
+      // Call logout API if needed
+      await api["user"].post("/logout");
+      
+      // Clear store data
+    store.dispatch(signOut())
+
+
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Logout failed";
+      throw new Error(errorMessage);
     }
   }
 

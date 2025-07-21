@@ -9,7 +9,8 @@ const initialAuthState: AuthState = {
     email: "",
     role: null,
     token: null,
-    isAuthenticated: false
+    isAuthenticated: false,
+    image:null,
 };
 
 const authSlice = createSlice({
@@ -24,6 +25,7 @@ const authSlice = createSlice({
                 role: UserRole; 
                 token: string;
                 isAuthenticated?: boolean;
+                image?: string | null;
             }>
         ) => {
             const { email,name, role, token, isAuthenticated } = action.payload;
@@ -32,6 +34,7 @@ const authSlice = createSlice({
             state.email = email;
             state.role = role;
             state.token = token;
+            state.image = action.payload.image || null;
         },
         setToken: (state, action: PayloadAction<{ token: string }>) => {
             state.token = action.payload.token;

@@ -18,5 +18,6 @@ export interface AuthState {
   role: UserRole | null;
   token: string | null;
   isAuthenticated: boolean;
+  image: string | null;
 }
 

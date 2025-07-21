@@ -737,7 +737,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ onSubmit, className = "" }) => {
         ...(isSignUp && {
           name: formData.name,
           mobile: formData.mobile,
-          confirmPassword: formData.confirmPassword,
+          
         }),
       });
 
@@ -1062,7 +1062,7 @@ const LoginCard: React.FC<LoginCardProps> = ({ onSubmit, className = "" }) => {
 
                 <button
                   type="button"
-                  onClick={handleSubmit}
+                  // onClick={handleSubmit}
                   disabled={isLoading}
                   className="w-full py-3 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                   style={{ backgroundColor: "#015F4A" }}

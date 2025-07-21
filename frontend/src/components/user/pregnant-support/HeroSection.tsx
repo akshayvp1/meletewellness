@@ -2,7 +2,7 @@
 
 import { Heart } from 'lucide-react';
 import { useIntersectionObserver } from '@/components/hooks/useIntersectionObserver';
-
+// import PregnantImage from '@/assets/pregnant.webp';
 export const HeroSection: React.FC = () => {
   const [headerRef, isHeaderVisible] = useIntersectionObserver(0.1);
 
@@ -40,7 +40,7 @@ export const HeroSection: React.FC = () => {
           }`}>
             <div className="relative">
               <img
-                src="/pregnant.webp"
+                src="/assets/pregnant.webp"
                 alt="Pregnant woman receiving mental health support"
                 className="w-full h-96 lg:h-[500px] object-cover rounded-3xl shadow-2xl"
                 onError={(e) => {
