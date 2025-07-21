@@ -661,6 +661,8 @@ addCollegeData = async (req: Request, res: Response): Promise<void> => {
   };
 
   logout = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+    console.log("logout called");
+    
     try {
       res.clearCookie("refreshToken", {
         httpOnly: true,
