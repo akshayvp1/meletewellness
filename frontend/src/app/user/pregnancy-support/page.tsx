@@ -1,33 +1,42 @@
-"use client";
+// src/app/pregnant-support/page.tsx
 
-import Head from 'next/head';
-import { HeroSection } from '@/components/user/pregnant-support/HeroSection';
-import { ServicesSection } from '@/components/user/pregnant-support/ServicesSection';
-import { ApproachSection } from '@/components/user/pregnant-support/ApproachSection';
-import Counsellors from '@/components/user/experts/ExpertCounsellors';
+import React from 'react';
+import type { Metadata } from 'next';
+import PregnancySupportClient from '@/components/user/pregnant-support/PregnantSupportClient';
 import SEO from '@/components/SEO';
-export default function PregnancySupportPage() {
+
+export const metadata: Metadata = {
+  title: 'Pregnancy & Postpartum Mental Health Support | Melete',
+  description:
+    'Emotional and psychological support for pregnant women and new mothers to manage stress, anxiety, and mood changes.',
+  keywords:
+    'pregnancy mental health, postpartum support, maternity counselling, pregnancy stress, emotional support for mothers',
+  openGraph: {
+    title: 'Pregnancy & Postpartum Mental Health Support | Melete',
+    description:
+      'Emotional and psychological support for pregnant women and new mothers to manage stress, anxiety, and mood changes.',
+    url: 'https://meletewellness.com/user/pregnant-support',
+    siteName: 'Melete Wellness',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pregnancy & Postpartum Mental Health Support | Melete',
+    description:
+      'Emotional and psychological support for pregnant women and new mothers to manage stress, anxiety, and mood changes.',
+  },
+};
+
+const PregnancySupportPage: React.FC = () => {
   return (
     <>
-      <Head>
-        <title>Pregnancy & Postpartum Mental Health Support | Melete</title>
-        <meta
-          name="description"
-          content="Emotional and psychological support for pregnant women and new mothers to manage stress, anxiety, and mood changes."
-        />
-        <meta
-          name="keywords"
-          content="pregnancy mental health, postpartum support, maternity counselling, pregnancy stress, emotional support for mothers"
-        />
-      </Head>
       <SEO />
-
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 pt-7">
-        <HeroSection />
-        <ServicesSection />
-        <ApproachSection />
-        <Counsellors />
+        <PregnancySupportClient />
+        
       </div>
     </>
   );
-}
+};
+
+export default PregnancySupportPage;

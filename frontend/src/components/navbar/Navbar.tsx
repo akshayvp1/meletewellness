@@ -438,14 +438,11 @@ const Navbar: React.FC = () => {
                   icon: '✅',
                 });
                 
-                // Redirect to home page
-                setTimeout(() => {
-                  window.location.href = '/';
-                }, 1000);
+               
               } catch (error) {
                 console.error('Logout failed:', error);
                 toast.error('Logout failed. Please try again.', {
-                  duration: 4000,
+                  duration: 1000,
                   icon: '❌',
                 });
               }
@@ -457,7 +454,7 @@ const Navbar: React.FC = () => {
         </div>
       </div>
     ), {
-      duration: Infinity,
+      duration: 2000,
       position: 'top-center',
     });
   };

@@ -1,107 +1,3 @@
-
-
-
-
-// 'use client';
-
-// import React from 'react';
-// import { motion, Variants } from 'framer-motion';
-// import { therapyImprovements } from './therapyData';
-// import TherapyCard from './TherapyCard';
-// import ScrollIndicators from './ScrollIndicators';
-// import { useActiveCard } from '@/components/hooks/useActiveCard';
-// // import ShowMoreButton from './ShowMoreButton';
-// import type { TherapyImprovement } from '../../../types/types';
-
-// // Define animation variants properly with correct typing
-// const sectionVariants: Variants = {
-//   hidden: { 
-//     opacity: 0, 
-//     y: 50 
-//   },
-//   visible: { 
-//     opacity: 1, 
-//     y: 0,
-//     transition: {
-//       duration: 0.6,
-//       ease: "easeOut"
-//     }
-//   }
-// };
-
-// const containerVariants: Variants = {
-//   hidden: { 
-//     opacity: 0 
-//   },
-//   visible: {
-//     opacity: 1,
-//     transition: {
-//       staggerChildren: 0.1,
-//       delayChildren: 0.2
-//     }
-//   }
-// };
-
-// const TherapyImprovementsSection: React.FC = () => {
-//   const { activeCard, handleCardClick } = useActiveCard();
-
-//   // Fallback if therapyImprovements is not available
-//   if (!therapyImprovements || !Array.isArray(therapyImprovements)) {
-//     console.error('therapyImprovements is not defined or not an array');
-//     return null;
-//   }
-
-//   return (
-//     <motion.section
-//       className="py-16 bg-gradient-to-br from-slate-50 via-white to-emerald-50"
-//       variants={sectionVariants}
-//       initial="hidden"
-//       whileInView="visible"
-//       viewport={{ once: true, amount: 0.2 }}
-//       aria-labelledby="improvements-heading"
-//     >
-//       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-//         <h2
-//           id="improvements-heading"
-//           className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#015F4A]"
-//         >
-//           What You Can Improve With Us
-//         </h2>
-//         <div className="relative">
-//           <motion.div
-//             className="
-//               flex flex-col gap-6
-//               md:grid md:grid-cols-4 md:gap-6
-//             "
-//             variants={containerVariants}
-//             initial="hidden"
-//             animate="visible"
-//           >
-//             {therapyImprovements.map((item: TherapyImprovement, index: number) => (
-//               <TherapyCard
-//                 key={item.title}
-//                 item={item}
-//                 index={index}
-//                 isActive={activeCard === index}
-//                 onClick={() => handleCardClick(index)}
-//               />
-//             ))}
-//           </motion.div>
-//           <ScrollIndicators />
-//         </div>
-//         {/* <ShowMoreButton /> */}
-//       </div>
-//     </motion.section>
-//   );
-// };
-
-// export default TherapyImprovementsSection;
-
-
-
-
-
-
 'use client';
 
 import React from 'react';
@@ -135,13 +31,13 @@ const containerVariants: Variants = {
 };
 
 const TherapyImprovementsSection: React.FC = () => {
-  const loading = useLoading(); // Custom loading hook
+  const loading = useLoading(500); // Reduced loading time for better UX
   const { activeCard, handleCardClick } = useActiveCard();
 
   // Loading fallback
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-20">
+      <div className="min-h-screen flex justify-center items-center py-20">
         <LoadingSpinner />
       </div>
     );
@@ -150,46 +46,59 @@ const TherapyImprovementsSection: React.FC = () => {
   // Data fallback
   if (!therapyImprovements || !Array.isArray(therapyImprovements)) {
     console.error('therapyImprovements is not defined or not an array');
-    return null;
+    return (
+      <div className="min-h-screen flex justify-center items-center py-20">
+        <p className="text-red-500">Error loading therapy improvements data</p>
+      </div>
+    );
   }
 
   return (
     <motion.section
-      className="py-16 bg-gradient-to-br from-slate-50 via-white to-emerald-50"
+      className="py-8 sm:py-12 md:py-16 bg-gradient-to-br from-slate-50 via-white to-emerald-50 min-h-screen"
       variants={sectionVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.2 }}
+      viewport={{ once: true, amount: 0.1 }}
       aria-labelledby="improvements-heading"
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <h2
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <motion.h2
           id="improvements-heading"
-          className="text-3xl md:text-4xl font-bold text-center mb-12 text-[#015F4A]"
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-center mb-8 sm:mb-12 text-[#015F4A]"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
         >
           What You Can Improve With Us
-        </h2>
+        </motion.h2>
 
-        <div className="relative">
+        <div className="relative w-full">
           <motion.div
-            className="flex flex-col gap-6 md:grid md:grid-cols-4 md:gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 w-full"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
           >
             {therapyImprovements.map((item: TherapyImprovement, index: number) => (
-              <TherapyCard
-                key={item.title}
-                item={item}
-                index={index}
-                isActive={activeCard === index}
-                onClick={() => handleCardClick(index)}
-              />
+              <motion.div
+                key={`${item.title}-${index}`}
+                className="w-full"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <TherapyCard
+                  item={item}
+                  index={index}
+                  isActive={activeCard === index}
+                  onClick={() => handleCardClick(index)}
+                />
+              </motion.div>
             ))}
           </motion.div>
           <ScrollIndicators />
         </div>
-        {/* <ShowMoreButton /> */}
       </div>
     </motion.section>
   );

@@ -1,32 +1,38 @@
-"use client";
+
 
 import React from 'react';
-import Head from 'next/head';
-import HeroSection from '@/components/user/child-support/HeroSection';
-import ServicesSection from '@/components/user/child-support/ServicesSection';
-import ApproachSection from '@/components/user/child-support/ApproachSection';
-import Counellors from '@/components/user/experts/ExpertCounsellors';
+import type { Metadata } from 'next';
+import ChildSupportClient from '@/components/user/child-support/ChildSupportClient';
 import SEO from '@/components/SEO';
+
+export const metadata: Metadata = {
+  title: 'Child Mental Health Support | Melete',
+  description:
+    'Dedicated mental health support for children, including emotional guidance, therapy, and wellness activities.',
+  keywords:
+    'child mental health, child counselling, therapy for kids, mental wellness for children, emotional support for kids',
+  openGraph: {
+    title: 'Child Mental Health Support | Melete',
+    description:
+      'Dedicated mental health support for children, including emotional guidance, therapy, and wellness activities.',
+    url: 'https://meletewellness.com/user/child-support',
+    siteName: 'Melete Wellness',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Child Mental Health Support | Melete',
+    description:
+      'Dedicated mental health support for children, including emotional guidance, therapy, and wellness activities.',
+  },
+};
+
 const ChildSupportPage: React.FC = () => {
   return (
     <>
-      <Head>
-        <title>Child Mental Health Support | Melete</title>
-        <meta
-          name="description"
-          content="Dedicated mental health support for children, including emotional guidance, therapy, and wellness activities."
-        />
-        <meta
-          name="keywords"
-          content="child mental health, child counselling, therapy for kids, mental wellness for children, emotional support for kids"
-        />
-      </Head>
       <SEO />
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-gray-50 pt-7">
-        <HeroSection />
-        <ServicesSection />
-        <ApproachSection />
-        <Counellors />
+        <ChildSupportClient />
       </div>
     </>
   );
