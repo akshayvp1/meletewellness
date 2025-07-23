@@ -4,7 +4,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 import ParentSupportClient from '@/components/user/parent-support/ParentSupportClient';
 import SEO from '@/components/SEO';
-import ParentImage from '@/../public/assets/parent.webp';
+// import ParentImage from '@/../public/assets/parent.webp';
 
 export const metadata: Metadata = {
   title: 'Parent Mental Health Support | Melete',
