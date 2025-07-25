@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useCounsellors } from '@/components/hooks/useCounsellors';
 import HeroSection from '@/components/user/experts/HeroSection';
 import CounsellorContent from '@/components/user/experts/CounsellorContent';
-import SEO from '@/components/SEO';
+
 
 const ExpertCounsellorsPage: React.FC = () => {
   const { consultants, loading, error, totalCount } = useCounsellors();
@@ -17,7 +17,6 @@ const ExpertCounsellorsPage: React.FC = () => {
 
   return (
     <>
-      <SEO />
       <div className="min-h-screen bg-gray-50 pt-10">
         <HeroSection totalCount={totalCount} />
         <CounsellorContent 

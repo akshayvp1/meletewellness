@@ -83,8 +83,6 @@
 
 
 
-
-
 // src/app/page.tsx
 import type { Metadata } from 'next';
 import ClientHomeContent from '@/components/ClientHomeContent';
@@ -102,6 +100,9 @@ export const metadata: Metadata = {
     'Melete Wellness',
   ],
   robots: { index: true, follow: true },
+  alternates: {
+    canonical: 'https://www.meletewellness.com/',
+  },
 };
 
 export default function Page() {

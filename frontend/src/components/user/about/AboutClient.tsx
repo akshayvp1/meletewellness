@@ -8,7 +8,7 @@ import WhyChooseSection from '@/components/user/about/WhyChooseSection';
 import SpecialtiesSection from '@/components/user/about/SpecialtiesSection';
 import HelpSection from '@/components/user/about/HelpSection';
 import AppDownloadSection from '@/components/user/about/AppDownloadSection';
-
+import StartupLogosSection from '@/components/user/certificate/startup';
 export default function AboutClient() {
   return (
     <main className="min-h-screen bg-white pt-7">
@@ -18,6 +18,7 @@ export default function AboutClient() {
       <SpecialtiesSection />
       <HelpSection />
       <AppDownloadSection />
+      <StartupLogosSection />
     </main>
   );
 }

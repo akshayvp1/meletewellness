@@ -5,12 +5,7 @@ import Link from 'next/link';
 export default function InternalServerError() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 py-12">
-      {/* Logo/Brand Section */}
-      {/* <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-800">Melete</h2>
-        <p className="text-sm text-gray-600 mt-1">Mental Health Services</p>
-      </div> */}
-
+     
       {/* 500 Content */}
       <div className="text-center max-w-md">
         <h1 className="text-6xl font-bold text-gray-300 mb-4">500</h1>

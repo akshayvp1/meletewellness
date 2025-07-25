@@ -137,7 +137,7 @@ const AdminDashboardLayout: React.FC<AdminDashboardLayoutProps> = ({ children })
             alt="Company Logo"
             className="h-10 mr-3"
           />
-          <h1 className="text-xl font-bold text-white"></h1>
+          {/* <h1 className="text-xl font-bold text-white"></h1> */}
         </div>
         
         {!isMobile && (

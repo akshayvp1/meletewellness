@@ -1,153 +1,115 @@
 
 
-
-
-
-
-
-// // src/app/layout.tsx
-// 'use client';
-// import { usePathname } from 'next/navigation';
-// import Navbar from '@/components/navbar/Navbar';
-// import Footer from '@/components/footer/footer';
 // import './globals.css';
+// import type { Metadata } from 'next';
+// import ClientLayout from './ClientLayout'; // ✅ Move hook-based logic here
+
+// export const metadata: Metadata = {
+//   title: 'Melete Wellness',
+//   description: '24/7 Mental Health Support Platform',
+// };
 
 // export default function RootLayout({ children }: { children: React.ReactNode }) {
-//   const pathname = usePathname();
-//   const hideLayout = ['/terms-and-condition','/user','/privacy','/admin','/terms-and-conditions'];
-
-//   const isLayoutHidden = hideLayout.some((path) => pathname.startsWith(path));
-
 //   return (
 //     <html lang="en">
 //       <body>
-//         <div className="flex flex-col min-h-screen">
-//           {!isLayoutHidden && <Navbar />}
-//           <main className="flex-grow pt-0 bg-gray-50">{children}</main>
-//           {!isLayoutHidden && <Footer />}
-//         </div>
+//         <ClientLayout>{children}</ClientLayout>
 //       </body>
 //     </html>
 //   );
 // }
 
-
-
-
-
-
-// 'use client';
-// import { usePathname } from 'next/navigation';
-// import { GoogleOAuthProvider } from '@react-oauth/google';
-// import Navbar from '@/components/navbar/Navbar';
-// import Footer from '@/components/footer/footer';
-// import './globals.css';
-
-// export default function RootLayout({ children }: { children: React.ReactNode }) {
-//   const pathname = usePathname();
-//   const hideLayout = ['/terms-and-condition','/user','/privacy','/admin','/terms-and-conditions'];
-
-//   const isLayoutHidden = hideLayout.some((path) => pathname.startsWith(path));
-
-//   return (
-//     <html lang="en">
-//       <body>
-//         <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-//           <div className="flex flex-col min-h-screen">
-//             {!isLayoutHidden && <Navbar />}
-//             <main className="flex-grow pt-0 bg-gray-50">{children}</main>
-//             {!isLayoutHidden && <Footer />}
-//           </div>
-//         </GoogleOAuthProvider>
-//       </body>
-//     </html>
-//   );
-// }
-
-
-// 'use client';
-
-// import { usePathname } from 'next/navigation';
-// import { GoogleOAuthProvider } from '@react-oauth/google';
-// import { Toaster } from 'react-hot-toast';
-// import Navbar from '@/components/navbar/Navbar';
-// import Footer from '@/components/footer/footer';
-// import ReduxProvider from '@/store/Provider'; // ✅ Import Redux Provider
-// import './globals.css';
-
-// export default function RootLayout({ children }: { children: React.ReactNode }) {
-//   const pathname = usePathname();
-//   const hideLayout = ['/terms-and-condition', '/user', '/privacy', '/admin', '/terms-and-conditions'];
-//   const isLayoutHidden = hideLayout.some((path) => pathname.startsWith(path));
-
-//   return (
-//     <html lang="en">
-//       <body>
-//         <ReduxProvider>
-//           <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-//             <div className="flex flex-col min-h-screen">
-//               {!isLayoutHidden && <Navbar />}
-//               <main className="flex-grow pt-0 bg-gray-50">{children}</main>
-//               {!isLayoutHidden && <Footer />}
-//             </div>
-//             <Toaster
-//               position="top-right"
-//               toastOptions={{
-//                 duration: 4000,
-//                 style: {
-//                   background: '#ffffff',
-//                   color: '#374151',
-//                   border: '1px solid #e5e7eb',
-//                   borderRadius: '8px',
-//                   boxShadow:
-//                     '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-//                 },
-//                 success: {
-//                   style: {
-//                     background: '#10b981',
-//                     color: '#ffffff',
-//                     border: '1px solid #10b981',
-//                   },
-//                   iconTheme: {
-//                     primary: '#ffffff',
-//                     secondary: '#10b981',
-//                   },
-//                 },
-//                 error: {
-//                   style: {
-//                     background: '#ef4444',
-//                     color: '#ffffff',
-//                     border: '1px solid #ef4444',
-//                   },
-//                   iconTheme: {
-//                     primary: '#ffffff',
-//                     secondary: '#ef4444',
-//                   },
-//                 },
-//               }}
-//             />
-//           </GoogleOAuthProvider>
-//         </ReduxProvider>
-//       </body>
-//     </html>
-//   );
-// }
 
 
 
 
 import './globals.css';
 import type { Metadata } from 'next';
-import ClientLayout from './ClientLayout'; // ✅ Move hook-based logic here
+import ClientLayout from './ClientLayout';
 
 export const metadata: Metadata = {
-  title: 'Melete Wellness',
-  description: '24/7 Mental Health Support Platform',
+  metadataBase: new URL('https://www.meletewellness.com'), // Remove www
+  title: {
+    default: 'Melete Wellness | 24/7 Mental Health Support Platform',
+    template: '%s | Melete Wellness'
+  },
+  description: 'Get professional 24/7 mental health support with Melete Wellness. Connect with certified counselors for anxiety, depression, stress management and more.',
+  keywords: [
+    'mental health support',
+    'online counseling',
+    '24/7 mental health',
+    'Melete wellness',
+    'mental health platform',
+    'online therapy',
+    'mental wellness support'
+  ],
+  authors: [{ name: 'Melete Wellness Team' }],
+  creator: 'Melete Wellness',
+  publisher: 'Melete Wellness',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: 'https://www.meletewellness.com/images/logo.png',
+    siteName: 'Melete Wellness',
+    title: 'Melete Wellness | 24/7 Mental Health Support Platform',
+    description: 'Get professional 24/7 mental health support with certified counselors.',
+    images: [
+      {
+        url: '', // Add this image
+        width: 1200,
+        height: 630,
+        alt: 'Melete Wellness Mental Health Support',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Melete Wellness | 24/7 Mental Health Support Platform',
+    description: 'Get professional 24/7 mental health support with certified counselors.',
+    images: ['https://www.meletewellness.com/images/logo.png'], // Add this image
+  },
+ 
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* Add structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "Melete Wellness",
+              "url": "https://meletewellness.com",
+              "logo": "https://www.meletewellness.com/images/logo.png",
+              "description": "24/7 Mental Health Support Platform",
+              "sameAs": [
+                "https://twitter.com/meletewellness",
+                "https://facebook.com/meletewellness"
+              ],
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+1-XXX-XXX-XXXX",
+                "contactType": "customer service"
+              }
+            })
+          }}
+        />
+      </head>
       <body>
         <ClientLayout>{children}</ClientLayout>
       </body>
