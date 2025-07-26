@@ -96,10 +96,28 @@ const PrivacyPolicyPage: React.FC = () => {
       <p><strong>• 9. Children's Privacy</strong></p>
       <p>Our services are intended for users aged 18 and above. We do not knowingly collect personal information from individuals under 18 years of age. If we become aware of such information, we will take steps to delete it promptly.</p>
 
-      <p><strong>• 10. Changes to this Privacy Policy</strong></p>
+      <p><strong>• 10. Refund Policy </strong></p>
+      <p>In the event that a customer is unable to attend a scheduled counselling session due to an error or technical issue caused by our platform, we offer a full refund of the session fee. </p>
+      <ul>
+        <p>Eligibility for Refund : </p>
+        <li>The refund is applicable only when the customer is unable to meet the counsellor due to a fault or technical issue from our side (e.g., app malfunction, scheduling error, or system failure).</li>
+        <li>Refund requests must be submitted within 48 hours of the scheduled session.</li>
+        <p>Refund Process:</p>
+        <li>Once the issue is verified and the refund request is approved, the refund amount will be processed to the original payment source.</li>
+        <li>Refunds will be completed within 7 business days from the date of approval.</li>
+        <p>How to Request a Refund:</p>
+        <p>Please contact our support team at connect@meletewellness.com with the following details:</p>
+        <li>Name and contact number</li>
+        <li>Appointment details (date and time)</li>
+        <li>Description of the issue</li>
+        <p>Refunds will not be granted for missed appointments due to user error or non-attendance without prior cancellation.</p>
+
+      </ul>
+
+      <p><strong>• 11. Changes to this Privacy Policy</strong></p>
       <p>We may update this Privacy Policy periodically. Any changes will be posted on this page with a revised "Effective Date". Continued use of our services after such updates signifies your acceptance of the revised policy.</p>
 
-      <p><strong>• 11. Contact Us</strong></p>
+      <p><strong>• 12. Contact Us</strong></p>
       <p>If you have any questions, concerns, or complaints regarding this Privacy Policy or our data practices, please contact us at:</p>
       <ul>
         <li><strong>Company:</strong> Melete Wellness Solutions Private Limited</li>
