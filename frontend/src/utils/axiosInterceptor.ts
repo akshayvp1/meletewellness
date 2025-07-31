@@ -167,7 +167,6 @@ const refreshAuthToken = async (role: UserRole): Promise<string | null> => {
 
   refreshPromises[role] = (async () => {
     try {
-      console.log(`Refreshing token for role: ${role}`);
       const response = await axios.post(
         `${API_URLS[role]}/refresh-token`,
         {},
@@ -180,17 +179,12 @@ const refreshAuthToken = async (role: UserRole): Promise<string | null> => {
 
       const newToken = response.data?.accessToken;
       if (newToken) {
-        console.log("New token received successfully");
         store.dispatch(setToken({ token: newToken }));
         return newToken;
       } else {
-        console.error("No access token in refresh response");
         throw new Error("No access token received");
       }
     } catch (error: any) {
-      console.error("Refresh token error:", error.response?.data || error.message);
-      console.log("🔴 Dispatching signOut due to token refresh failure");
-      // ✅ This will reset name, email, token, role, isAuthenticated to initial state
       store.dispatch(signOut());
       return null;
     } finally {
@@ -214,11 +208,9 @@ const createAxiosInstance = (role: UserRole): AxiosInstance => {
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
-      console.log(`Making request to: ${config.baseURL}${config.url}`);
       return config;
     },
     (error) => {
-      console.error("Request interceptor error:", error);
       return Promise.reject(error);
     }
   );
@@ -243,13 +235,11 @@ const createAxiosInstance = (role: UserRole): AxiosInstance => {
             originalRequest.headers.Authorization = `Bearer ${newToken}`;
             return instance(originalRequest);
           } else {
-            // ✅ Token refresh failed, auth state already cleared by refreshAuthToken
             console.log("🔴 Authentication failed - user logged out");
             return Promise.reject(new Error("Authentication failed"));
           }
         } catch (refreshError) {
-          console.error("Failed to refresh token:", refreshError);
-          // ✅ Ensure signOut is called here too
+         
           console.log("🔴 Dispatching signOut due to refresh error");
           store.dispatch(signOut());
           return Promise.reject(refreshError);
