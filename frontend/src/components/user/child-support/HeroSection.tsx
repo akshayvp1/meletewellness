@@ -38,7 +38,7 @@ const [elementRef, isVisible] = useIntersectionObserver(0.1);
           <AnimatedSection isVisible={isVisible} direction="right" delay={300}>
             <div className="relative">
               <img
-                src="/assets/child.webp"
+                src="/assets/child-ai.webp"
                 alt="Child playing in therapy session"
                 className="w-full h-96 lg:h-[500px] object-cover rounded-3xl shadow-2xl"
                 onError={(e) => {

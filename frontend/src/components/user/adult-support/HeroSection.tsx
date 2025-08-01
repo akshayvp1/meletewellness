@@ -3,7 +3,7 @@
 import React from 'react';
 import { User } from 'lucide-react';
 import { useIntersectionObserver } from '@/components/hooks/useIntersectionObserver';
-import AdultImage from '@/../public/assets/adult.webp';
+import AdultImage from '@/../public/assets/adult-ai.webp';
 
 const HeroSection: React.FC = () => {
 const [headerRef, isHeaderVisible] = useIntersectionObserver(0.1);

@@ -9,11 +9,16 @@ import {
 import { SupportGroup } from '@/types/types';
 
 // Import your images here
-import ChildImage from "@/../../public/assets/child.webp";
-import AdultImage from "@/../../public/assets/adult.webp";
-import ParentImage from "@/../../public/assets/parent.webp";
+// import ChildImage from "@/../../public/assets/child.webp";
+// import AdultImage from "@/../../public/assets/adult.webp";
+// import ParentImage from "@/../../public/assets/parent.webp";
+
+import ChildImage from "@/../../public/assets/child-ai.webp";
+import AdultImage from "@/../../public/assets/adult-ai.webp";
+import ParentImage from "@/../../public/assets/parent-ai.webp";
+
 import PregnantImage from "@/../../public/assets/pregnant.webp";
-import OldageImage from "@/../../public/assets/oldage.webp";
+import OldageImage from "@/../../public/assets/senior.webp";
 
 export const supportGroupsData: SupportGroup[] = [
   {
