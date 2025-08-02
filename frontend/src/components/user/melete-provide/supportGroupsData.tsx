@@ -17,7 +17,7 @@ import ChildImage from "@/../../public/assets/child-ai.webp";
 import AdultImage from "@/../../public/assets/adult-ai.webp";
 import ParentImage from "@/../../public/assets/parent-ai.webp";
 
-import PregnantImage from "@/../../public/assets/pregnant.webp";
+import PregnantImage from "@/../../public/assets/pregnanat-lady.webp";
 import OldageImage from "@/../../public/assets/senior.webp";
 
 export const supportGroupsData: SupportGroup[] = [
