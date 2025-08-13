@@ -704,6 +704,28 @@ addCollegeData = async (req: Request, res: Response): Promise<void> => {
     });
   }
 };
+  contactUs = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { name, email, phone, message } = req.body; 
+      if (!name || !email || !phone || !message) {
+        res.status(400).json({ success: false, message: "All fields are required" });
+        return;
+      } 
+      const contactResult = await this.adminAuthService.contactUs({ name, email, phone, message }); 
+
+      res.status(200).json({
+        success: true,
+        message: "Contact message sent successfully",
+        data: contactResult
+      });
+    } catch (error: any) {
+      console.error("Error in contactUs controller:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Failed to send contact message",
+      });
+    }
+  }
 
   
 }

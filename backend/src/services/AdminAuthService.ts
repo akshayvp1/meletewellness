@@ -450,6 +450,14 @@ async unBlockExpertise(id: string): Promise<IExpertise | null> {
     throw new Error("Failed to check email");
   }
 }
+  async contactUs(formData: { name: string; email: string; phone: string; message: string }): Promise<void> {
+    try {
+      await this.adminAuthRepository.contactUs(formData);
+    } catch (error: any) {
+      console.error("Error in contactUs service:", error);
+      throw new Error(error.message || "Failed to send contact message");
+    } 
+  }
 
 
   }

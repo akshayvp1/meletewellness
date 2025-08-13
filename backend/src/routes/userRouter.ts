@@ -10,6 +10,7 @@ const adminAuthController = container.resolve(AdminAuthController);
 user.get("/front-counsellors", adminAuthController.frontGetCounsellors);
 user.post("/google-login",adminAuthController.GoogleLogin)
 user.get('/check',userAuthenticate,adminAuthController.Check);
+user.post("/contact-us", adminAuthController.contactUs);
 user.post("/logout", adminAuthController.logout);
 
 export default user

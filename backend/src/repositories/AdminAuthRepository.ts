@@ -10,7 +10,14 @@ import { OAuth2Client } from "google-auth-library";
 import { ICollege } from "../interfaces/ICollege";
 import { IAdminUser } from "../interfaces/IAdminUser";
 import { IExpertise } from "../interfaces/IExpertise";
+import { ContactDocument } from "../interfaces/IContact";
 
+// interface FormData {
+//   name: string;
+//   email: string;
+//   phone: string;
+//   message: string;
+// }
 interface ICounsellorData {
   name: string;
   qualification: string;
@@ -49,13 +56,17 @@ class AdminAuthRepository implements IAdminAuthRepository {
     private readonly collegeModel:Model<ICollege>
     private readonly adminUserModel:Model<IAdminUser>
     private readonly expertiseModel:Model<IExpertise> 
+    private readonly contactModel: Model<ContactDocument>;
+
+    // Injecting models through constructor
     constructor(
         @inject("AdminModel") adminModel: Model<IAdmin>,
         @inject("CounsellorModel") counsellorModel: Model<ICounsellor>,
         @inject("UserModel")userModel:Model<IUser>,
         @inject("CollegeModel")collegeModel:Model<ICollege>,
         @inject("AdminUserModel")adminUserModel:Model<IAdminUser>,
-        @inject("ExpertiseModel") expertiseModel: Model<IExpertise>
+        @inject("ExpertiseModel") expertiseModel: Model<IExpertise>,
+        @inject("ContactModel") contactModel: Model<ContactDocument>
     ) {
         this.adminModel = adminModel;
         this.counsellorModel = counsellorModel;
@@ -63,6 +74,7 @@ class AdminAuthRepository implements IAdminAuthRepository {
         this.collegeModel = collegeModel
         this.adminUserModel=adminUserModel
         this.expertiseModel = expertiseModel;
+        this.contactModel = contactModel;
     }
 
     async findByEmail(email: string): Promise<IAdmin | null> {
@@ -475,8 +487,17 @@ async getCollegesList(): Promise<ICollege[]> {
     throw new Error("Failed to check email");
   }
 }
+  async contactUs(formData: { name: string; email: string; phone: string; message: string }): Promise<void> {
+    try {
+      const contactMessage = new this.contactModel(formData);
+      await contactMessage.save();
+      console.log("Contact message saved successfully");
+    } catch (error: any) {
+      console.error("Error in contactUs repository:", error);
+      throw new Error(error.message || "Failed to send contact message");
+    }
 
-
+  }
 
 }
 
