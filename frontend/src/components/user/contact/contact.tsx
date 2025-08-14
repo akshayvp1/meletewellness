@@ -15,6 +15,7 @@ interface FormData {
 interface FormErrors {
   name?: string;
   email?: string;
+  phone?: string;
   message?: string;
 }
 
@@ -30,22 +31,69 @@ const ContactPage: React.FC = () => {
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  // Real-time validation function for individual fields
+  const validateField = (fieldName: string, value: string): string | undefined => {
+    switch (fieldName) {
+      case 'name':
+        if (!value.trim()) {
+          return 'Full name is required';
+        } else if (value.trim().length === 0 || /^\s+$/.test(value)) {
+          return 'Name cannot contain only spaces';
+        } else if (/^\d+$/.test(value.trim())) {
+          return 'Name cannot contain only numbers';
+        } else if (value.trim().length < 2) {
+          return 'Name must be at least 2 characters long';
+        }
+        break;
+
+      case 'email':
+        if (!value.trim()) {
+          return 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) {
+          return 'Please enter a valid email address';
+        }
+        break;
+
+      case 'phone':
+        if (value.trim()) {
+          const phoneNumber = value.trim().replace(/\D/g, '');
+          if (phoneNumber.length > 0 && phoneNumber.length < 10) {
+            return 'Phone number must be exactly 10 digits';
+          } else if (phoneNumber.length === 10 && !/^[9876]/.test(phoneNumber)) {
+            return 'Phone number must start with 9, 8, 7, or 6';
+          }
+        }
+        break;
+
+      case 'message':
+        if (!value.trim()) {
+          return 'Message is required';
+        } else {
+          const words = value.trim().split(/\s+/).filter(word => word.length > 0);
+          if (words.length > 0 && words.length < 5) {
+            return 'Message must contain at least 5 words';
+          } else if (words.length > 100) {
+            return 'Message cannot exceed 100 words';
+          }
+        }
+        break;
+    }
+    return undefined;
+  };
+
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = 'Full name is required';
-    }
+    // Validate all fields
+    const nameError = validateField('name', formData.name);
+    const emailError = validateField('email', formData.email);
+    const phoneError = validateField('phone', formData.phone);
+    const messageError = validateField('message', formData.message);
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
-    }
-
-    if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
-    }
+    if (nameError) newErrors.name = nameError;
+    if (emailError) newErrors.email = emailError;
+    if (phoneError) newErrors.phone = phoneError;
+    if (messageError) newErrors.message = messageError;
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -53,16 +101,34 @@ const ContactPage: React.FC = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // For phone field, only allow digits and limit to 10
+    if (name === 'phone') {
+      const digitsOnly = value.replace(/\D/g, '');
+      if (digitsOnly.length <= 10) {
+        setFormData(prev => ({
+          ...prev,
+          [name]: digitsOnly
+        }));
+        
+        // Real-time validation for phone
+        const phoneError = validateField('phone', digitsOnly);
+        setErrors(prev => ({
+          ...prev,
+          phone: phoneError
+        }));
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
 
-    // Clear error when user starts typing
-    if (errors[name as keyof FormErrors]) {
+      // Real-time validation for other fields
+      const fieldError = validateField(name, value);
       setErrors(prev => ({
         ...prev,
-        [name]: undefined
+        [name]: fieldError
       }));
     }
   };
@@ -161,7 +227,7 @@ const ContactPage: React.FC = () => {
                   <div>
                     <h3 className="text-lg font-semibold mb-2 text-gray-900">Melete Wellness</h3>
                     <p className="text-gray-600 text-sm mb-1">Room No. 35/2142 A ,Second Floor</p>
-                    <p className="text-gray-600 text-sm">VK Tower, Mankavu, Kozhikode - 673007</p>
+                    <p className="text-gray-600 text-sm">VK Tower, Mankavu, Kozhikode - 673007</p>
                   </div>
                 </div>
               </div>
@@ -173,17 +239,17 @@ const ContactPage: React.FC = () => {
                 </h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-700">Monday - Saturday:</span>
+                    <span className="text-gray-700">Monday - Sunday:</span>
                     <span className="text-gray-600 font-medium">10:00 AM - 6:00 PM</span>
                   </div>
                   {/* <div className="flex justify-between items-center">
                     <span className="text-gray-700">Saturday:</span>
                     <span className="text-gray-600 font-medium">10:00 AM - 4:00 PM</span>
                   </div> */}
-                  <div className="flex justify-between items-center">
+                  {/* <div className="flex justify-between items-center">
                     <span className="text-gray-700">Sunday:</span>
                     <span className="text-gray-600 font-medium">Closed</span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -260,9 +326,15 @@ const ContactPage: React.FC = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-20 focus:ring-[#015F4A] focus:border-[#015F4A] hover:border-gray-400"
-                      placeholder="Enter your phone number"
+                      className={`w-full px-4 py-3 border rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-opacity-20 ${
+                        errors.phone 
+                          ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-[#015F4A] focus:border-[#015F4A] hover:border-gray-400'
+                      }`}
+                      placeholder="Enter 10-digit phone number"
+                      maxLength={10}
                     />
+                    {errors.phone && <p className="mt-2 text-sm text-red-600">{errors.phone}</p>}
                   </div>
 
                   <div>
@@ -280,9 +352,29 @@ const ContactPage: React.FC = () => {
                           ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
                           : 'border-gray-300 focus:ring-[#015F4A] focus:border-[#015F4A] hover:border-gray-400'
                       }`}
-                      placeholder="Tell us about your project or how we can assist you..."
+                      placeholder="Tell us about your project or how we can assist you... (5-100 words)"
                     />
                     {errors.message && <p className="mt-2 text-sm text-red-600">{errors.message}</p>}
+                    <div className="mt-1 text-xs text-gray-500">
+                      Word count: {formData.message.trim() ? formData.message.trim().split(/\s+/).filter(word => word.length > 0).length : 0}/100
+                      {formData.message.trim() && (
+                        <span className={`ml-2 ${
+                          (() => {
+                            const wordCount = formData.message.trim().split(/\s+/).filter(word => word.length > 0).length;
+                            if (wordCount < 5) return 'text-orange-500';
+                            if (wordCount > 100) return 'text-red-500';
+                            return 'text-green-500';
+                          })()
+                        }`}>
+                          {(() => {
+                            const wordCount = formData.message.trim().split(/\s+/).filter(word => word.length > 0).length;
+                            if (wordCount < 5) return '(Need more words)';
+                            if (wordCount > 100) return '(Too many words)';
+                            return '✓ Word count good';
+                          })()}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <button
