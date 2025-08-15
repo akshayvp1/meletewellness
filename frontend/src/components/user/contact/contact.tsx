@@ -198,6 +198,7 @@ const ContactPage: React.FC = () => {
                     {/* <p className="text-gray-600 text-sm">support@company.com</p> */}
                   </div>
                 </div>
+                
 
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
