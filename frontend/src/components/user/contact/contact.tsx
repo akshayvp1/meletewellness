@@ -101,7 +101,7 @@ const ContactPage: React.FC = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>): void => {
     const { name, value } = e.target;
-    
+     
     
     if (name === 'phone') {
       const digitsOnly = value.replace(/\D/g, '');
