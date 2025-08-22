@@ -7,7 +7,7 @@ import TherapyImprovementsSection from '@/components/user/improve-with-us/Therap
 import Experts from '@/components/user/experts/ExpertCounsellors';
 import WhatWeOffer from '@/components/user/service/what-we-offer';
 import SessionPlans from '@/components/user/service/session-plans';
-import SupportSubscription from '@/components/user/support-subscription/MentalHealthCTA';
+// import SupportSubscription from '@/components/user/support-subscription/MentalHealthCTA';
 import WhatsAppButton from '@/components/WhatsAppButton';
 
 export default function ClientHomeContent() {
@@ -19,7 +19,7 @@ export default function ClientHomeContent() {
         <Experts />
         <WhatWeOffer />
         <SessionPlans />
-        <SupportSubscription />
+        {/* <SupportSubscription /> */}
       </main>
       <WhatsAppButton />
     </div>
