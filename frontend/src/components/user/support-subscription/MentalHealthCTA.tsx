@@ -48,7 +48,7 @@ const MentalHealthCTA: React.FC<MentalHealthCTAProps> = ({
 
     setIsConnecting(true);
     
-    // Simulate connection process
+
     await new Promise(resolve => setTimeout(resolve, 2000));
     
     setIsConnecting(false);
