@@ -64,11 +64,36 @@ class CounsellorDataService {
         throw new Error("Error collecting employee data");
       }
 }
-  async getEmployeeById(id: string): Promise<EmployeeData> {
+  // CounsellorDataService.ts
+async getEmployeeById(id: string): Promise<EmployeeData> {
   try {
     const response = await api["user"].get(`/getEmployeeById/${id}`);
-    return response.data;
+    console.log(response.data, "response data in service❤️❤️❤️❤️");
+    
+    // Extract the nested 'data' field containing the employee details
+    const employeeData = response.data.data;
+    
+    // Validate the employee data
+    if (!employeeData || !employeeData._id) {
+      throw new Error("Invalid employee data received");
+    }
+    
+    // Map the response to match EmployeeData interface
+    return {
+      id: employeeData._id,
+      name: employeeData.name,
+      email: employeeData.email,
+      employeeId: employeeData.employeeId,
+      phone: employeeData.phone,
+      company: employeeData.company,
+      bloodGroup: employeeData.bloodGroup,
+      address: employeeData.address,
+      status: employeeData.status,
+      imageUrl: employeeData.imageUrl,
+      createdAt: new Date(employeeData.createdAt),
+    };
   } catch (error) {
+    console.error("Error fetching employee data:", error);
     throw new Error("Error fetching employee data");
   }
 }
