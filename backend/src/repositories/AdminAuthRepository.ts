@@ -517,7 +517,7 @@ async addEmployeeId(EmployeData: EmployeeId): Promise<EmployeeId> {
     });
     const id = EmployeData.employeeId;
 
-   const profileUrl = `http://localhost:3000/user/employeeid/${id}`;
+   const profileUrl = `https://meletewellness.com/user/employeeid/${id}`;
    const qrCodeData = await QRCode.toDataURL(profileUrl);
 
 
