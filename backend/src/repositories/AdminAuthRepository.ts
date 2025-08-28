@@ -15,6 +15,7 @@ import { EmployeeId } from "../interfaces/IEmployeeId";
 import QRCode from 'qrcode';
 import bwipjs from 'bwip-js';
 
+
 interface ICounsellorData {
   name: string;
   qualification: string;
