@@ -8,7 +8,7 @@ import { inject, injectable } from "tsyringe";
 import { IAdminAuthController } from "./interface/IAdminAuthController";
 import AdminAuthService from "../services/AdminAuthService";
 import { ITokenPayload } from "../utils/jwt";
-// import { ICollege } from "../interfaces/ICollege";
+
 interface ICounsellorData {
   name: string;
   qualification: string;
@@ -726,6 +726,59 @@ addCollegeData = async (req: Request, res: Response): Promise<void> => {
       });
     }
   }
+
+  addEmployeeId = async (req: Request, res: Response): Promise<void> => {
+    try {
+      
+      const employeeData = req.body;
+      if (!employeeData.name || !employeeData.email || !employeeData.phone || !employeeData.company || !employeeData.bloodGroup || !employeeData.address) {
+        res.status(400).json({
+          success: false,
+          message: "Missing required fields: name, email, phone, company, bloodGroup, address",
+        });
+        return;
+      }
+
+      const addedEmployee = await this.adminAuthService.addEmployeeId(employeeData);
+
+      res.status(201).json({
+        success: true,
+        data: addedEmployee,
+        message: "Employee added successfully",
+      });
+    } catch (error: any) {
+      console.error("Error in addEmployeeId:", error);
+      res.status(500).json({
+        success: false,
+        message: error.message || "Failed to add employee",
+      });
+    }
+  };
+ getEmployeeById = async (req: Request, res: Response): Promise<void> => {
+    try {
+      const { id } = req.params;
+      if (!id) {
+        res.status(400).json({ success: false, message: "Employee ID is required" });
+        return;
+      }
+      const employee = await this.adminAuthService.getEmployeeById(id);
+      if (!employee) {
+        res.status(404).json({ success: false, message: "Employee not found" });
+        return;
+      }
+      res.status(200).json({
+        success: true,
+        data: employee,
+        message: "Employee retrieved successfully",
+      });
+    } catch (error: any) {
+      console.error("Error in getEmployeeById controller:", error);
+      res.status(500).json({ 
+        success: false,
+        message: error.message || "Internal server error" 
+      });
+    }
+  }     
 
   
 }

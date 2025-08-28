@@ -55,6 +55,7 @@ admin.post('/add-expertise',adminAuthController.addExpertise)
 admin.patch('/update-expertise/:id',adminAuthController.updateExpertise)
 admin.patch('/block-expertise/:id',adminAuthController.blockExpertise)  
 admin.patch('/unblock-expertise/:id',adminAuthController.unBlockExpertise)
+admin.post("/addEmployeeId",adminAuthenticate,adminAuthController.addEmployeeId);
 
 
 export default admin;

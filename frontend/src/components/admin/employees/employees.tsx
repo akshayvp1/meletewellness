@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState, useRef } from "react";
+import CounsellorService from "@/services/user/CounsellorDataService";
 import {
   UserRound,
   Plus,
@@ -15,11 +16,14 @@ import {
   ToggleLeft,
   ToggleRight,
   Image,
+  Loader2,
+  Hash,
 } from "lucide-react";
 
 type Employee = {
   id: string;
   name: string;
+  employeeId: string;
   email: string;
   phone: string;
   company: string;
@@ -30,33 +34,36 @@ type Employee = {
   createdAt: string;
 };
 
-const seed: Employee[] = [
-  {
-    id: "EMP001",
-    name: "Akshay VP",
-    email: "akshay@example.com",
-    phone: "6282031099",
-    company: "Instill",
-    bloodGroup: "B+",
-    address: "Kochi, Kerala",
-    status: "Active",
-    imageUrl: "",
-    createdAt: new Date().toISOString(),
-  },
-];
+type EmployeeData = {
+  name: string;
+  employeeId: string;
+  email: string;
+  phone: string;
+  company: string;
+  bloodGroup: string;
+  address: string;
+  status: "Active" | "Inactive";
+  imageUrl?: string;
+  createdAt: Date;
+};
+
+
 
 const primary = "#015F4A";
 
 export default function EmployeesPage() {
-  const [employees, setEmployees] = useState<Employee[]>(seed);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   // Modal form state
   const [form, setForm] = useState<Omit<Employee, "id" | "createdAt">>({
     name: "",
     email: "",
     phone: "",
+    employeeId: "",
     company: "",
     bloodGroup: "",
     address: "",
@@ -82,6 +89,7 @@ export default function EmployeesPage() {
       name: "",
       email: "",
       phone: "",
+      employeeId: "",
       company: "",
       bloodGroup: "",
       address: "",
@@ -91,25 +99,105 @@ export default function EmployeesPage() {
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const handleImage = (file?: File) => {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setForm((f) => ({ ...f, imageUrl: url }));
+  // Upload image to Cloudinary
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    const cloudinaryFormData = new FormData();
+    cloudinaryFormData.append("file", file);
+    cloudinaryFormData.append("upload_preset", "ad-upload");
+    cloudinaryFormData.append("folder", "melete/counsellor");
+
+    try {
+      const response = await fetch(
+        "https://api.cloudinary.com/v1_1/dedrcfbxf/image/upload",
+        {
+          method: "POST",
+          body: cloudinaryFormData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const data = await response.json();
+      return data.secure_url;
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      throw new Error("Failed to upload image to Cloudinary");
+    }
   };
 
-  const addEmployee = (e: React.FormEvent) => {
+  const handleImage = async (file?: File) => {
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      // Upload to Cloudinary and get the URL
+      const imageUrl = await uploadToCloudinary(file);
+      setForm((f) => ({ ...f, imageUrl }));
+    } catch (error) {
+      alert("Failed to upload image. Please try again.");
+      console.error("Image upload error:", error);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const addEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newEmp: Employee = {
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      ...form,
-    };
-    setEmployees((prev) => [newEmp, ...prev]);
-    setOpen(false);
-    resetForm();
+    setLoading(true);
+
+    try {
+      // Prepare employee data for API
+      const employeeData: EmployeeData = {
+        name: form.name,
+        email: form.email,
+        employeeId: form.employeeId,
+        phone: form.phone,
+        company: form.company,
+        bloodGroup: form.bloodGroup,
+        address: form.address,
+        status: form.status,
+        imageUrl: form.imageUrl,
+        createdAt: new Date(),
+      };
+
+      // Call the API service
+      const response = await CounsellorService.CollectingEmployeeData(employeeData);
+      
+      // Create new employee with generated ID and the same timestamp
+      const newEmp: Employee = {
+        id: response.id || crypto.randomUUID(),
+        createdAt: employeeData.createdAt.toISOString(),
+        name: employeeData.name,
+        employeeId: employeeData.employeeId,
+        email: employeeData.email,
+        phone: employeeData.phone,
+        company: employeeData.company,
+        bloodGroup: employeeData.bloodGroup,
+        address: employeeData.address,
+        status: employeeData.status,
+        imageUrl: employeeData.imageUrl,
+      };
+
+      // Update local state
+      setEmployees((prev) => [newEmp, ...prev]);
+      setOpen(false);
+      resetForm();
+      
+      // Success notification
+      alert("Employee added successfully!");
+      
+    } catch (error) {
+      console.error("Error adding employee:", error);
+      alert("Failed to add employee. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleModalClose = () => {
+    if (loading || uploadingImage) return; // Prevent closing during operations
     setOpen(false);
     resetForm();
   };
@@ -191,7 +279,7 @@ export default function EmployeesPage() {
                         )}
                         <div>
                           <div className="font-medium text-gray-900">{e.name}</div>
-                          <div className="text-xs text-gray-500">{e.id}</div>
+                          <div className="text-xs text-gray-500">ID: {e.employeeId}</div>
                         </div>
                       </div>
                     </td>
@@ -266,7 +354,7 @@ export default function EmployeesPage() {
         </div>
       </div>
 
-      {/* Add Employee Modal - Centered on full screen */}
+      {/* Add Employee Modal */}
       {open && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           {/* Backdrop */}
@@ -275,7 +363,7 @@ export default function EmployeesPage() {
             onClick={handleModalClose}
           ></div>
           
-          {/* Modal Container - Centered on full viewport */}
+          {/* Modal Container */}
           <div className="fixed inset-0 flex items-center justify-center p-4">
             {/* Modal */}
             <div className="relative w-full max-w-3xl transform overflow-hidden rounded-xl bg-white shadow-xl transition-all max-h-[90vh] overflow-y-auto">
@@ -286,13 +374,14 @@ export default function EmployeesPage() {
                 <h2 className="text-lg font-semibold">Add New Employee</h2>
                 <button
                   onClick={handleModalClose}
-                  className="rounded-md p-1 hover:bg-white/10 transition-colors"
+                  disabled={loading || uploadingImage}
+                  className="rounded-md p-1 hover:bg-white/10 transition-colors disabled:opacity-50"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              <div onSubmit={addEmployee} className="px-6 py-6">
+              <form onSubmit={addEmployee} className="px-6 py-6">
                 {/* Profile Image */}
                 <div className="mb-6">
                   <div className="flex items-center gap-4">
@@ -311,10 +400,18 @@ export default function EmployeesPage() {
                       <button
                         type="button"
                         onClick={() => fileRef.current?.click()}
-                        className="rounded-lg px-4 py-2 text-white shadow-sm transition-opacity hover:opacity-90"
+                        disabled={uploadingImage || loading}
+                        className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
                         style={{ backgroundColor: primary }}
                       >
-                        Upload Image
+                        {uploadingImage ? (
+                          <>
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          "Upload Image"
+                        )}
                       </button>
                       <p className="mt-1 text-xs text-gray-500">
                         Recommended: square image, at least 200×200px
@@ -326,6 +423,7 @@ export default function EmployeesPage() {
                     type="file"
                     accept="image/*"
                     hidden
+                    disabled={uploadingImage || loading}
                     onChange={(e) => handleImage(e.target.files?.[0])}
                   />
                 </div>
@@ -339,6 +437,16 @@ export default function EmployeesPage() {
                     onChange={(v) => setForm((f) => ({ ...f, name: v }))}
                     leftIcon={<UserRound className="w-4 h-4 text-gray-400" />}
                     required
+                    disabled={loading}
+                  />
+                  <Field
+                    label="Employee ID *"
+                    placeholder="Enter employee ID"
+                    value={form.employeeId}
+                    onChange={(v) => setForm((f) => ({ ...f, employeeId: v }))}
+                    leftIcon={<Hash className="w-4 h-4 text-gray-400" />}
+                    required
+                    disabled={loading}
                   />
                   <Field
                     label="Email Address *"
@@ -348,6 +456,7 @@ export default function EmployeesPage() {
                     onChange={(v) => setForm((f) => ({ ...f, email: v }))}
                     leftIcon={<Mail className="w-4 h-4 text-gray-400" />}
                     required
+                    disabled={loading}
                   />
                   <Field
                     label="Phone Number *"
@@ -356,6 +465,7 @@ export default function EmployeesPage() {
                     onChange={(v) => setForm((f) => ({ ...f, phone: v }))}
                     leftIcon={<Phone className="w-4 h-4 text-gray-400" />}
                     required
+                    disabled={loading}
                   />
                   <Field
                     label="Company Name *"
@@ -364,6 +474,7 @@ export default function EmployeesPage() {
                     onChange={(v) => setForm((f) => ({ ...f, company: v }))}
                     leftIcon={<Building2 className="w-4 h-4 text-gray-400" />}
                     required
+                    disabled={loading}
                   />
                   {/* Blood Group select */}
                   <SelectField
@@ -373,6 +484,7 @@ export default function EmployeesPage() {
                     options={[
                       "", "A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-",
                     ]}
+                    disabled={loading}
                   />
                   {/* Status toggle */}
                   <div className="flex flex-col">
@@ -381,13 +493,14 @@ export default function EmployeesPage() {
                     </label>
                     <button
                       type="button"
+                      disabled={loading}
                       onClick={() =>
                         setForm((f) => ({
                           ...f,
                           status: f.status === "Active" ? "Inactive" : "Active",
                         }))
                       }
-                      className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="inline-flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
                     >
                       {form.status === "Active" ? (
                         <ToggleRight className="w-5 h-5 text-green-600" />
@@ -407,13 +520,14 @@ export default function EmployeesPage() {
                     </label>
                     <textarea
                       required
+                      disabled={loading}
                       value={form.address}
                       onChange={(e) =>
                         setForm((f) => ({ ...f, address: e.target.value }))
                       }
                       rows={3}
                       placeholder="Enter complete address"
-                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                     />
                   </div>
                 </div>
@@ -423,19 +537,28 @@ export default function EmployeesPage() {
                   <button
                     type="button"
                     onClick={handleModalClose}
-                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    disabled={loading || uploadingImage}
+                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90"
+                    disabled={loading || uploadingImage}
+                    className="inline-flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-white shadow-sm transition-opacity hover:opacity-90 disabled:opacity-50"
                     style={{ backgroundColor: primary }}
                   >
-                    Add Employee
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Adding Employee...
+                      </>
+                    ) : (
+                      "Add Employee"
+                    )}
                   </button>
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>
@@ -454,6 +577,7 @@ function Field({
   leftIcon,
   type = "text",
   required,
+  disabled,
 }: {
   label: string;
   placeholder?: string;
@@ -462,6 +586,7 @@ function Field({
   leftIcon?: React.ReactNode;
   type?: string;
   required?: boolean;
+  disabled?: boolean;
 }) {
   return (
     <div className="flex flex-col">
@@ -474,11 +599,12 @@ function Field({
         )}
         <input
           required={required}
+          disabled={disabled}
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className={`w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+          className={`w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50 ${
             leftIcon ? "pl-9" : ""
           }`}
         />
@@ -492,20 +618,23 @@ function SelectField({
   value,
   onChange,
   options,
+  disabled,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   options: string[];
+  disabled?: boolean;
 }) {
   return (
     <div className="flex flex-col">
       <label className="mb-1 text-sm font-medium text-gray-700">{label}</label>
       <select
         required
+        disabled={disabled}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+        className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-colors disabled:opacity-50"
       >
         {options.map((o) => (
           <option key={o} value={o}>

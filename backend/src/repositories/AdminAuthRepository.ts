@@ -11,13 +11,10 @@ import { ICollege } from "../interfaces/ICollege";
 import { IAdminUser } from "../interfaces/IAdminUser";
 import { IExpertise } from "../interfaces/IExpertise";
 import { ContactDocument } from "../interfaces/IContact";
+import { EmployeeId } from "../interfaces/IEmployeeId";
+import QRCode from 'qrcode';
+import bwipjs from 'bwip-js';
 
-// interface FormData {
-//   name: string;
-//   email: string;
-//   phone: string;
-//   message: string;
-// }
 interface ICounsellorData {
   name: string;
   qualification: string;
@@ -56,8 +53,8 @@ class AdminAuthRepository implements IAdminAuthRepository {
     private readonly collegeModel:Model<ICollege>
     private readonly adminUserModel:Model<IAdminUser>
     private readonly expertiseModel:Model<IExpertise> 
-    private readonly contactModel: Model<ContactDocument>;
-
+    private readonly contactModel: Model<ContactDocument>
+    private readonly employeeModel:Model<EmployeeId>
     // Injecting models through constructor
     constructor(
         @inject("AdminModel") adminModel: Model<IAdmin>,
@@ -66,7 +63,8 @@ class AdminAuthRepository implements IAdminAuthRepository {
         @inject("CollegeModel")collegeModel:Model<ICollege>,
         @inject("AdminUserModel")adminUserModel:Model<IAdminUser>,
         @inject("ExpertiseModel") expertiseModel: Model<IExpertise>,
-        @inject("ContactModel") contactModel: Model<ContactDocument>
+        @inject("ContactModel") contactModel: Model<ContactDocument>,
+        @inject("EmployeeModel") employeeModel:Model<EmployeeId>
     ) {
         this.adminModel = adminModel;
         this.counsellorModel = counsellorModel;
@@ -75,6 +73,7 @@ class AdminAuthRepository implements IAdminAuthRepository {
         this.adminUserModel=adminUserModel
         this.expertiseModel = expertiseModel;
         this.contactModel = contactModel;
+        this.employeeModel = employeeModel;
     }
 
     async findByEmail(email: string): Promise<IAdmin | null> {
@@ -498,8 +497,81 @@ async getCollegesList(): Promise<ICollege[]> {
     }
 
   }
+  async findEmployeeByEmail(email: string): Promise<boolean> {
+    try {
+      const user = await this.userModel.findOne({ email }).lean();
+      return !!user; // returns true if user exists, false otherwise
 
 }
 
+    catch (error) {
+      console.error("Error in Check repository:", error);
+      throw new Error("Failed to check email");
+    }
+  } 
 
+async addEmployeeId(EmployeData: EmployeeId): Promise<EmployeeId> {
+  try {
+    const newEmployee = new this.employeeModel({
+      ...EmployeData,
+    });
+    const id = EmployeData.employeeId;
+
+   const profileUrl = `http://localhost:3000/user/employeeid/${id}`;
+   const qrCodeData = await QRCode.toDataURL(profileUrl);
+
+
+
+
+
+    // ✅ Generate Barcode
+    const barcodeData = await bwipjs.toBuffer({
+      bcid: 'code128',
+      text: id,
+      scale: 3,
+      height: 10,
+      includetext: true,
+      textxalign: 'center',
+    });
+    const barcodeBase64 = `data:image/png;base64,${barcodeData.toString('base64')}`;
+
+    // ✅ Save images in DB
+    newEmployee.qrCodeImage = qrCodeData;
+    newEmployee.barcodeImage = barcodeBase64;
+
+    const savedEmployee = await newEmployee.save();
+    return savedEmployee.toObject();
+  } catch (error: any) {
+    console.error("Repository Error (addEmployeeId):", error);
+    if (error.code === 11000) {
+      throw new Error("Employee with this email or barcode already exists");
+    }
+    throw error;
+  }
+}
+
+async getEmployeeById(employeeId: string): Promise<EmployeeId | null> {
+  try {
+    console.log("Searching for Employee ID:", employeeId);
+
+    const employee = await this.employeeModel
+      .findOne({ employeeId: { $regex: `^${employeeId}$`, $options: "i" } })
+      .lean<EmployeeId>();
+
+    if (!employee) {
+      console.warn(`Employee with ID ${employeeId} not found`);
+      return null;
+    }
+
+    return employee;
+  } catch (error) {
+    console.error("Error fetching employee by EmployeeId:", error);
+    throw new Error(`Failed to fetch employee data`);
+  }
+}
+
+
+
+  
+}
 export default AdminAuthRepository;

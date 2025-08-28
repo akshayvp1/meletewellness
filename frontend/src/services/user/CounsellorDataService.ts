@@ -4,6 +4,20 @@ import { api } from "@/utils/axiosInterceptor";
 
 import { Consultant } from "@/types/types";
 
+export interface EmployeeData{
+  id?: string; // Optional because MongoDB auto-generates it
+  name: string;
+  email: string;
+  employeeId: string;
+  phone: string;
+  company: string;
+  bloodGroup: string;
+  address: string;
+  status: 'Active' | 'Inactive';
+  imageUrl?: string;
+  createdAt: Date; // Will store as Date in DB
+}
+
 class CounsellorDataService {
   async frontGetCounsellors(): Promise<Consultant[]> {
     try {
@@ -40,5 +54,23 @@ class CounsellorDataService {
       );
     }
   }
+
+
+    async CollectingEmployeeData(EmployeData:EmployeeData):Promise<EmployeeData>{
+      try {
+        const response = await api["admin"].post("/addEmployeeId",EmployeData);
+        return response.data;
+      } catch (error) {
+        throw new Error("Error collecting employee data");
+      }
+}
+  async getEmployeeById(id: string): Promise<EmployeeData> {
+  try {
+    const response = await api["user"].get(`/getEmployeeById/${id}`);
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching employee data");
+  }
+}
 }
 export default new CounsellorDataService();

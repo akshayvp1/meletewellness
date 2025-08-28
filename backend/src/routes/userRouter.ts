@@ -12,5 +12,6 @@ user.post("/google-login",adminAuthController.GoogleLogin)
 user.get('/check',userAuthenticate,adminAuthController.Check);
 user.post("/contact-us", adminAuthController.contactUs);
 user.post("/logout", adminAuthController.logout);
+user.get('/getEmployeeById/:id',adminAuthController.getEmployeeById)
 
 export default user

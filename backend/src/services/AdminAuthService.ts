@@ -14,12 +14,26 @@ import { IUser } from "../interfaces/IUser";
 import { ICollege } from "../interfaces/ICollege";
 import { IAdminUser } from "../interfaces/IAdminUser";
 import { IExpertise } from "../interfaces/IExpertise";
+import { EmployeeId } from "../interfaces/IEmployeeId";
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
 
 // Ensure secrets are defined
 if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
   throw new Error("JWT secrets are not defined in .env file");
+}
+
+export interface EmployeeData{
+  id?: string; // Optional because MongoDB auto-generates it
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  bloodGroup: string;
+  address: string;
+  status: 'Active' | 'Inactive';
+  imageUrl?: string;
+  createdAt: Date; // Will store as Date in DB
 }
 
 interface SignInResult {
@@ -459,8 +473,32 @@ async unBlockExpertise(id: string): Promise<IExpertise | null> {
     } 
   }
 
-
+  async addEmployeeId(employeeData:EmployeeId):Promise<EmployeeId>{
+    try {
+      const existingEmail = await this.adminAuthRepository.findEmployeeByEmail(employeeData.email);
+      if (existingEmail) {
+        throw new Error("Employee with this email already exists");
+      }
+      const employee = await this.adminAuthRepository.addEmployeeId(employeeData);
+      return employee
+    } catch (error: any) {
+      console.error("Error in expertise service:", error);
+      throw new Error("Failed to retrieve expertise");
+    }
   }
 
+  async getEmployeeById(id: string): Promise<EmployeeData> { 
+  try {
+    const employee = await this.adminAuthRepository.getEmployeeById(id);
+    if (!employee) {
+      throw new Error("Employee not found");
+    }
+    return employee;
+  } catch (error: any) {
+    console.error("Error in getEmployeeById service:", error);
+    throw new Error("Failed to retrieve employee data");
+  }   
+}
 
+}
 export default AdminAuthService;
