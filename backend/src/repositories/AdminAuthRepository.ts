@@ -526,15 +526,17 @@ async addEmployeeId(EmployeData: EmployeeId): Promise<EmployeeId> {
 
 
     // ✅ Generate Barcode
-    const barcodeData = await bwipjs.toBuffer({
-      bcid: 'code128',
-      text: id,
-      scale: 3,
-      height: 10,
-      includetext: true,
-      textxalign: 'center',
-    });
-    const barcodeBase64 = `data:image/png;base64,${barcodeData.toString('base64')}`;
+  // Generate Barcode with URL text instead of just ID
+const barcodeData = await bwipjs.toBuffer({
+  bcid: 'code128',
+  text: profileUrl, // Use full URL here
+  scale: 3,
+  height: 20,
+  includetext: true,
+  textxalign: 'center',
+});
+const barcodeBase64 = `data:image/png;base64,${barcodeData.toString('base64')}`;
+
 
     // ✅ Save images in DB
     newEmployee.qrCodeImage = qrCodeData;
