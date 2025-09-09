@@ -500,7 +500,7 @@ async getCollegesList(): Promise<ICollege[]> {
   }
   async findEmployeeByEmail(email: string): Promise<boolean> {
     try {
-      const user = await this.userModel.findOne({ email }).lean();
+      const user = await this.employeeModel.findOne({ email }).lean();
       return !!user; // returns true if user exists, false otherwise
 
 }

@@ -14,7 +14,7 @@ const TherapyServicesCard: React.FC = () => {
     {
       title: "Essential Support",
       sessions: "Single Session",
-      price: 499,
+      price: 599,
       items: [
         "Establishing rapport",
         "Provide a safe, supportive and non-judgmental space to explore yourself",

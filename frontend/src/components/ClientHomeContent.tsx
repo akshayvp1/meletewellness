@@ -9,7 +9,7 @@ import WhatWeOffer from '@/components/user/service/what-we-offer';
 import SessionPlans from '@/components/user/service/session-plans';
 // import SupportSubscription from '@/components/user/support-subscription/MentalHealthCTA';
 import WhatsAppButton from '@/components/WhatsAppButton';
-
+import  PregnantsOffer  from '@/components/user/pregnants/pregnants-offer';
 export default function ClientHomeContent() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F9F9F9] to-white font-sans overflow-x-hidden text-gray-900">
@@ -19,6 +19,7 @@ export default function ClientHomeContent() {
         <Experts />
         <WhatWeOffer />
         <SessionPlans />
+        <PregnantsOffer/>
         {/* <SupportSubscription /> */}
       </main>
       <WhatsAppButton />
