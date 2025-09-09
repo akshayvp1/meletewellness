@@ -176,6 +176,14 @@ const PregnancyKit: React.FC = () => {
                     <span className="font-bold text-gray-900">24*7 on-demand emotional support</span> - Immediate care and guidance whenever you need it
                   </div>
                 </div>
+
+
+                <div className="flex items-start gap-3 lg:gap-4">
+                  <div className="text-green-600 text-xl lg:text-2xl flex-shrink-0">🃏</div>
+                  <div className="text-gray-700 leading-relaxed font-medium text-sm lg:text-base">
+                    <span className="font-bold text-gray-900">Daily activity cards</span> - Engaging tasks to support your daily emotional and mental well-being
+                  </div>
+                </div>
                 
                 <div className="flex items-start gap-3 lg:gap-4">
                   <div className="text-green-600 text-xl lg:text-2xl flex-shrink-0">🎥</div>
@@ -205,12 +213,7 @@ const PregnancyKit: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 lg:gap-4">
-                  <div className="text-green-600 text-xl lg:text-2xl flex-shrink-0">🃏</div>
-                  <div className="text-gray-700 leading-relaxed font-medium text-sm lg:text-base">
-                    <span className="font-bold text-gray-900">Daily activity cards</span> - Engaging tasks to support your daily emotional and mental well-being
-                  </div>
-                </div>
+                
 
                 {/* Pricing */}
                 <div className="flex flex-col items-center lg:items-start gap-2 pt-4">
