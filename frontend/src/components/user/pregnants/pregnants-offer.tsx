@@ -122,7 +122,7 @@ const PregnancyKit: React.FC = () => {
               {/* Center Circle */}
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold text-sm z-10">
                 <div className="text-center">
-                  <div>5 Activities</div>
+                  <div>5 Activities Cards</div>
                 </div>
               </div>
 
@@ -205,21 +205,32 @@ const PregnancyKit: React.FC = () => {
                   </div>
                 </div>
 
+                <div className="flex items-start gap-3 lg:gap-4">
+                  <div className="text-green-600 text-xl lg:text-2xl flex-shrink-0">🃏</div>
+                  <div className="text-gray-700 leading-relaxed font-medium text-sm lg:text-base">
+                    <span className="font-bold text-gray-900">Daily activity cards</span> - Engaging tasks to support your daily emotional and mental well-being
+                  </div>
+                </div>
+
                 {/* Pricing */}
                 <div className="flex flex-col items-center lg:items-start gap-2 pt-4">
-                  <div className="text-gray-900 text-xl lg:text-2xl font-bold">₹4,999 +GST</div>
+                  <div className="text-gray-900 text-xl lg:text-2xl font-bold">
+                    ₹4,999 <span className="text-sm">+GST</span>
+                  </div>
                   <div className="flex flex-col items-center lg:items-start">
-                    <span className="text-red-500 text-lg lg:text-xl font-bold line-through">₹9,999 +GST</span>
+                    <span className="text-red-500 text-lg lg:text-xl font-bold line-through">
+                      ₹9,999 <span className="text-sm">+GST</span>
+                    </span>
                     <span className="text-green-600 text-sm font-semibold">50% OFF</span>
                   </div>
                 </div>
+
+                {/* Description */}
+                <div className="text-gray-700 text-sm lg:text-base leading-relaxed font-medium text-center lg:text-left">
+                  We offer comprehensive support for your pregnancy journey with 24*7 emotional support, live counseling, monthly progress monitoring, a self-reflection journal, soothing music and guided meditation, and daily activity cards to enhance your well-being. Click "Connect Now" to message us on WhatsApp and learn more about how we can support you during this special time.
+                </div>
               </div>
             </div>
-
-            {/* Description */}
-            {/* <div className="text-gray-700 text-sm lg:text-base leading-relaxed font-medium text-center lg:text-left">
-              We offer comprehensive support for your pregnancy journey with 24*7 emotional support, live counseling, monthly progress monitoring, a self-reflection journal, and soothing music and guided meditation.
-            </div> */}
 
             {/* Connect Button */}
             <div className="pt-6 lg:pt-8 text-center lg:text-left">

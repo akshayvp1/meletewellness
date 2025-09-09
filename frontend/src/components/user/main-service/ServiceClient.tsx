@@ -4,7 +4,7 @@ import HeroSection from '@/components/user/main-service/HeroSection';
 import AboutSection from '@/components/user/main-service/AboutSection';
 import SpecialtiesSection from '@/components/user/main-service/SpecialtiesSection';
 import OfferingsSection from '@/components/user/service/what-we-offer';
-
+import  PregnantsOffer  from '@/components/user/pregnants/pregnants-offer';
 
 const MeleteServicesPage: React.FC = () => {
   return (
@@ -13,6 +13,7 @@ const MeleteServicesPage: React.FC = () => {
         <HeroSection />
         <AboutSection />
         <SpecialtiesSection />
+        <PregnantsOffer/>
         <OfferingsSection />
       </main>
     </div>
