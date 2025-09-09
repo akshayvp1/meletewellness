@@ -15,11 +15,14 @@ export default function ClientHomeContent() {
     <div className="min-h-screen bg-gradient-to-b from-[#F9F9F9] to-white font-sans overflow-x-hidden text-gray-900">
       <main className="pt-16" role="main">
         <Improve />
+        
         <TherapyImprovementsSection />
+       
         <Experts />
+        <PregnantsOffer/>
         <WhatWeOffer />
         <SessionPlans />
-        <PregnantsOffer/>
+        
         {/* <SupportSubscription /> */}
       </main>
       <WhatsAppButton />

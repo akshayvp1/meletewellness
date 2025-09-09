@@ -16,151 +16,226 @@ const PregnancyKit: React.FC = () => {
     { id: 5, image: '/assets/tiny cuddles.webp', alt: 'Tiny Cuddles', bgColor: 'bg-pink-200' },
   ];
 
-  const cardImages = [
-    { id: 1, image: '/images/pregnancy-card-1.png', bgColor: 'bg-yellow-100' },
-    { id: 2, image: '/images/pregnancy-card-2.png', bgColor: 'bg-orange-100' },
-    { id: 3, image: '/images/pregnancy-card-3.png', bgColor: 'bg-teal-100' },
-  ];
-
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-emerald-50 overflow-hidden">
-      <div className="max-w-6xl mx-auto p-6">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
-          Pregnancy Mental Health Kit
-        </h1>
-      </div>
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 via-white to-emerald-50">
+      <div className="max-w-6xl mx-auto p-4 lg:p-8">
+        {/* Header */}
+        <div className="text-center mb-8 lg:mb-16">
+          <h1 className="text-3xl lg:text-5xl font-bold text-gray-900 mb-4">
+            Pregnancy Mental Health Kit
+          </h1>
 
-      <div className="grid lg:grid-cols-2 gap-12 items-center">
-        {/* Left Section - Activities Circle */}
-        <div className="flex justify-center">
-          <div className="relative w-[500px] h-[500px]">
-            {/* Center Circle */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold text-sm z-10">
-              <div className="text-center">
-                <div className="text-xs">5 Activities</div>
+          {/* Activities Circle - Mobile View (Below Heading) */}
+          <div className="flex justify-center md:hidden">
+            <div className="relative w-[250px] h-[250px]">
+              {/* Center Circle */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold text-xs z-10">
+                <div className="text-center">
+                  <div>5 Activities</div>
+                </div>
               </div>
-            </div>
 
-            {/* Activity Icons arranged in circle */}
-            {activities.map((activity, index) => {
-              const angle = (index * 72) - 90; // 360/5 = 72 degrees apart, -90 to start at top
-              const radius = 170; // Increased radius to utilize full space
-              const x = Math.cos((angle * Math.PI) / 180) * radius;
-              const y = Math.sin((angle * Math.PI) / 180) * radius;
+              {/* Activity Icons arranged in circle - Mobile */}
+              {activities.map((activity, index) => {
+                const angle = (index * 72) - 90;
+                const radius = 90;
+                const x = Math.cos((angle * Math.PI) / 180) * radius;
+                const y = Math.sin((angle * Math.PI) / 180) * radius;
 
-              return (
-                <div
-                  key={activity.id}
-                  className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
-                  style={{
-                    transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
-                  }}
-                >
-                  <div className={`w-44 h-44 rounded-full ${activity.bgColor} border-4 border-white shadow-xl flex items-center justify-center overflow-hidden relative`}>
-                    <img
-                      src={activity.image}
-                      alt={activity.alt}
-                      className="w-40 h-40 object-cover rounded-full"
-                    />
-                    <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm">
-                      <p className="text-xs font-semibold text-gray-800 text-center whitespace-nowrap">
-                        {activity.alt}
-                      </p>
+                return (
+                  <div
+                    key={activity.id}
+                    className="absolute top-1/2 left-1/2"
+                    style={{
+                      transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
+                    }}
+                  >
+                    <div className="flex flex-col items-center">
+                      <div className={`w-16 h-16 rounded-full ${activity.bgColor} border-2 border-white shadow-md flex items-center justify-center overflow-hidden relative transition-all duration-300 hover:scale-105`}>
+                        <img
+                          src={activity.image}
+                          alt={activity.alt}
+                          className="w-14 h-14 object-cover rounded-full"
+                        />
+                      </div>
+                      <div className="mt-2 bg-white/95 backdrop-blur-sm px-1 py-0.5 rounded-full shadow-sm min-w-[80px]">
+                        <p className="text-[10px] font-semibold text-gray-800 text-center whitespace-nowrap">
+                          {activity.alt}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        {/* Right Section - Cards and Content */}
-        <div className="space-y-8">
-          {/* Floating Cards */}
-          <div className="flex justify-center lg:justify-start mb-8">
-            <div className="relative w-80 h-44">
-              {cardImages.map((card, index) => (
-                <div
-                  key={card.id}
-                  className={`absolute w-32 h-40 ${card.bgColor} rounded-xl shadow-xl border-3 border-white overflow-hidden transition-transform hover:scale-105`}
-                  style={{
-                    left: `${index * 60}px`,
-                    top: `${Math.sin(index * 0.5) * 20}px`,
-                    transform: `rotate(${(index - 1) * 12}deg)`,
-                    zIndex: cardImages.length - index,
-                  }}
-                >
-                  <img
-                    src={card.image}
-                    alt={`Pregnancy card ${card.id}`}
-                    className="w-full h-full object-cover"
-                  />
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+          {/* Left Section - Activities Circle (Tablet and Desktop) */}
+          <div className="hidden md:flex justify-center order-2 lg:order-1">
+            {/* Tablet Layout - Medium Circular */}
+            <div className="block lg:hidden relative w-[350px] h-[350px]">
+              {/* Center Circle */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-20 h-20 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold text-sm z-10">
+                <div className="text-center">
+                  <div>5 Activities</div>
                 </div>
-              ))}
+              </div>
+
+              {/* Activity Icons arranged in circle - Tablet */}
+              {activities.map((activity, index) => {
+                const angle = (index * 72) - 90;
+                const radius = 120;
+                const x = Math.cos((angle * Math.PI) / 180) * radius;
+                const y = Math.sin((angle * Math.PI) / 180) * radius;
+
+                return (
+                  <div
+                    key={activity.id}
+                    className="absolute top-1/2 left-1/2"
+                    style={{
+                      transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
+                    }}
+                  >
+                    <div className="flex flex-col items-center">
+                      <div className={`w-24 h-24 rounded-full ${activity.bgColor} border-3 border-white shadow-lg flex items-center justify-center overflow-hidden relative transition-all duration-300 hover:scale-105`}>
+                        <img
+                          src={activity.image}
+                          alt={activity.alt}
+                          className="w-20 h-20 object-cover rounded-full"
+                        />
+                      </div>
+                      <div className="mt-2 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full shadow-sm min-w-[100px]">
+                        <p className="text-xs font-semibold text-gray-800 text-center whitespace-nowrap">
+                          {activity.alt}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Layout - Large Circular */}
+            <div className="hidden lg:block relative w-[520px] h-[520px]">
+              {/* Center Circle */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-teal-600 rounded-full flex items-center justify-center text-white font-semibold text-sm z-10">
+                <div className="text-center">
+                  <div>5 Activities</div>
+                </div>
+              </div>
+
+              {/* Activity Icons arranged in circle */}
+              {activities.map((activity, index) => {
+                const angle = (index * 72) - 90;
+                const radius = 180;
+                const x = Math.cos((angle * Math.PI) / 180) * radius;
+                const y = Math.sin((angle * Math.PI) / 180) * radius;
+
+                return (
+                  <div
+                    key={activity.id}
+                    className="absolute top-1/2 left-1/2"
+                    style={{
+                      transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
+                    }}
+                  >
+                    <div className="flex flex-col items-center">
+                      <div className={`w-36 h-36 rounded-full ${activity.bgColor} border-4 border-white shadow-xl flex items-center justify-center overflow-hidden relative transition-all duration-300 hover:scale-105`}>
+                        <img
+                          src={activity.image}
+                          alt={activity.alt}
+                          className="w-32 h-32 object-cover rounded-full"
+                        />
+                      </div>
+                      <div className="mt-2 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-full shadow-lg min-w-[120px]">
+                        <p className="text-sm font-semibold text-gray-800 text-center whitespace-nowrap">
+                          {activity.alt}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Pricing */}
-          <div className="flex gap-6 justify-center lg:justify-start mt-20 items-center">
-            <div className="text-white px-6 py-3 rounded-lg font-bold text-xl" style={{ backgroundColor: '#015F4A' }}>
-              ₹4,999
-            </div>
-            <div className="flex flex-col items-start">
-              <span className="text-gray-500 text-sm font-medium">MRP</span>
-              <span className="text-red-500 text-lg font-bold line-through">₹9,999</span>
-              <span className="text-green-600 text-sm font-semibold">50% OFF</span>
-            </div>
-          </div>
-
-          {/* Features List */}
-          <div className="space-y-4 text-gray-800">
-            <div className="text-xl font-bold bg-gradient-to-r from-gray-900 to-[#015F4A] bg-clip-text text-transparent tracking-tight">
-              Our Services for Pregnant Women
-            </div>
-            
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="text-green-600 text-xl">📞</div>
-                <div className="text-gray-700 leading-relaxed font-medium text-sm">
-                  <span className="font-bold text-gray-900">24 x 7 Support</span> - Continuous care and guidance throughout pregnancy
-                </div>
+          {/* Right Section - Content */}
+          <div className="space-y-8 lg:space-y-10 order-1 lg:order-2">
+            {/* Features List */}
+            <div className="space-y-6 text-gray-800">
+              <div className="text-lg lg:text-xl font-bold bg-gradient-to-r from-gray-900 to-[#015F4A] bg-clip-text text-transparent tracking-tight text-center lg:text-left">
+                Our Services for Pregnant Women
               </div>
               
-              <div className="flex items-start gap-3">
-                <div className="text-green-600 text-xl">🧘‍♀️</div>
-                <div className="text-gray-700 leading-relaxed font-medium text-sm">
-                  <span className="font-bold text-gray-900">5 Wellness Activities</span> - Specially designed sessions for each stage of pregnancy
+              <div className="space-y-4">
+                <div className="flex items-start gap-3 lg:gap-4">
+                  <div className="text-green-600 text-xl lg:text-2xl flex-shrink-0">📞</div>
+                  <div className="text-gray-700 leading-relaxed font-medium text-sm lg:text-base">
+                    <span className="font-bold text-gray-900">24*7 on-demand emotional support</span> - Immediate care and guidance whenever you need it
+                  </div>
                 </div>
-              </div>
-              
-              <div className="flex items-start gap-3">
-                <div className="text-green-600 text-xl">📔</div>
-                <div className="text-gray-700 leading-relaxed font-medium text-sm">
-                  <span className="font-bold text-gray-900">Pregnancy Journal (Diary)</span> - A safe space to record thoughts, feelings, and milestones
+                
+                <div className="flex items-start gap-3 lg:gap-4">
+                  <div className="text-green-600 text-xl lg:text-2xl flex-shrink-0">🎥</div>
+                  <div className="text-gray-700 leading-relaxed font-medium text-sm lg:text-base">
+                    <span className="font-bold text-gray-900">Live video and audio counselling sessions</span> - Personalized support with expert counselors
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3 lg:gap-4">
+                  <div className="text-green-600 text-xl lg:text-2xl flex-shrink-0">📊</div>
+                  <div className="text-gray-700 leading-relaxed font-medium text-sm lg:text-base">
+                    <span className="font-bold text-gray-900">Monthly progress monitoring</span> - Regular check-ins to track your well-being
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 lg:gap-4">
+                  <div className="text-green-600 text-xl lg:text-2xl flex-shrink-0">📔</div>
+                  <div className="text-gray-700 leading-relaxed font-medium text-sm lg:text-base">
+                    <span className="font-bold text-gray-900">Self-reflection journal</span> - A safe space to record thoughts, feelings, and milestones
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 lg:gap-4">
+                  <div className="text-green-600 text-xl lg:text-2xl flex-shrink-0">🎶</div>
+                  <div className="text-gray-700 leading-relaxed font-medium text-sm lg:text-base">
+                    <span className="font-bold text-gray-900">Music and guided meditation</span> - Curated playlists and mindfulness sessions to promote relaxation
+                  </div>
+                </div>
+
+                {/* Pricing */}
+                <div className="flex flex-col items-center lg:items-start gap-2 pt-4">
+                  <div className="text-gray-900 text-xl lg:text-2xl font-bold">₹4,999 +GST</div>
+                  <div className="flex flex-col items-center lg:items-start">
+                    <span className="text-red-500 text-lg lg:text-xl font-bold line-through">₹9,999 +GST</span>
+                    <span className="text-green-600 text-sm font-semibold">50% OFF</span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          {/* Description */}
-          <div className="text-gray-700 text-sm leading-relaxed font-medium">
-            We provide round-the-clock support to ensure mothers feel safe, cared for, and guided during their pregnancy journey. Our wellness activities focus on physical, emotional, and mental well-being, while the pregnancy journal helps capture every special moment and track personal progress.
-          </div>
+            {/* Description */}
+            {/* <div className="text-gray-700 text-sm lg:text-base leading-relaxed font-medium text-center lg:text-left">
+              We offer comprehensive support for your pregnancy journey with 24*7 emotional support, live counseling, monthly progress monitoring, a self-reflection journal, and soothing music and guided meditation.
+            </div> */}
 
-          {/* Connect Button */}
-          <div className="pt-6">
-            <button 
-              className="text-white font-semibold py-3 px-8 rounded-full transition-colors duration-200 shadow-lg hover:opacity-90"
-              style={{ backgroundColor: '#015F4A' }}
-            >
-              Connect Now
-            </button>
+            {/* Connect Button */}
+            <div className="pt-6 lg:pt-8 text-center lg:text-left">
+              <a 
+                href="https://wa.me/+918943175522?text=I%20want%20to%20know%20more%20about%20the%20service"
+                className="text-white font-semibold py-3 lg:py-4 px-8 lg:px-10 rounded-full transition-colors duration-200 shadow-lg hover:opacity-90 w-full lg:w-auto max-w-sm inline-block"
+                style={{ backgroundColor: '#015F4A' }}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Connect Now
+              </a>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   );
 };
