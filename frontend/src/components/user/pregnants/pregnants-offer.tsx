@@ -214,7 +214,6 @@ const PregnancyKit: React.FC = () => {
                 </div>
 
                 
-
                 {/* Pricing */}
                 <div className="flex flex-col items-center lg:items-start gap-2 pt-4">
                   <div className="text-gray-900 text-xl lg:text-2xl font-bold">
